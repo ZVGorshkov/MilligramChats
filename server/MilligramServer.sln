@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35728.132
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MilligramServer", "MilligramServer\MilligramServer.csproj", "{E95E654F-CE05-4C64-A678-E42178CC0A77}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MilligramServer.Domain", "MilligramServer.Domain\MilligramServer.Domain.csproj", "{8522D265-030E-4C38-9F81-F840275F466B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MilligramServer.Database", "MilligramServer.Database\MilligramServer.Database.csproj", "{A958E54D-83EE-4E58-92C9-F31E3A6A9D0F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MilligramServer.Common", "MilligramServer.Common\MilligramServer.Common.csproj", "{AAD03A0D-A357-4720-B0E4-2D7140EC7A7A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MilligramServer.Services", "MilligramServer.Services\MilligramServer.Services.csproj", "{711A509A-BFB1-4FF5-B4E2-744766B9AC2C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E95E654F-CE05-4C64-A678-E42178CC0A77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E95E654F-CE05-4C64-A678-E42178CC0A77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E95E654F-CE05-4C64-A678-E42178CC0A77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E95E654F-CE05-4C64-A678-E42178CC0A77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8522D265-030E-4C38-9F81-F840275F466B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8522D265-030E-4C38-9F81-F840275F466B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8522D265-030E-4C38-9F81-F840275F466B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8522D265-030E-4C38-9F81-F840275F466B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A958E54D-83EE-4E58-92C9-F31E3A6A9D0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A958E54D-83EE-4E58-92C9-F31E3A6A9D0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A958E54D-83EE-4E58-92C9-F31E3A6A9D0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A958E54D-83EE-4E58-92C9-F31E3A6A9D0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AAD03A0D-A357-4720-B0E4-2D7140EC7A7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAD03A0D-A357-4720-B0E4-2D7140EC7A7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAD03A0D-A357-4720-B0E4-2D7140EC7A7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAD03A0D-A357-4720-B0E4-2D7140EC7A7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{711A509A-BFB1-4FF5-B4E2-744766B9AC2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{711A509A-BFB1-4FF5-B4E2-744766B9AC2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{711A509A-BFB1-4FF5-B4E2-744766B9AC2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{711A509A-BFB1-4FF5-B4E2-744766B9AC2C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,4945 @@
+﻿using MilligramClient.Domain.Dtos;
+using RestSharp;
+
+namespace MilligramClient.Api.Clients.Account;
+
+public class AccountClient : HttpClientBase, IAccountClient
+{
+    public AccountClient(string address, TimeSpan timeout)
+        : base(address, timeout)
+    {
+    }
+
+    public Task<TokenDto> LoginAsync(
+        LoginDto login,
+        CancellationToken cancellationToken = default)
+    {
+        return SendRequestAsync<TokenDto>(
+            Method.Post,
+            "api/account/login",
+            request => request
+                .AddBody(login),
+            cancellationToken);
+    }
+
+    public Task RegisterAsync(
+        RegisterDto register,
+        CancellationToken cancellationToken = default)
+    {
+        return SendRequestAsync(
+            Method.Post,
+            "api/account/register",
+            request => request
+                .AddBody(register),
+            cancellationToken);
+    }
+
+    public Task<TokenDto> RefreshTokenAsync(
+        string token,
+        CancellationToken cancellationToken = default)
+    {
+        return SendRequestAsync<TokenDto>(
+            Method.Post,
+            "api/account/refresh",
+            token,
+            cancellationToken);
+    }
+
+    public Task ChangePasswordAsync(
+        string token,
+        ChangePasswordDto changePassword,
+        CancellationToken cancellationToken = default)
+    {
+        return SendRequestAsync(
+            Method.Post,
+            "api/account/change-password",
+            token,
+            request => request
+                .AddBody(changePassword),
+            cancellationToken);
+    }
+}
+
+using MilligramClient.Domain.Dtos;
+
+namespace MilligramClient.Api.Clients.Account;
+
+public interface IAccountClient
+{
+    Task<TokenDto> LoginAsync(
+        LoginDto login,
+        CancellationToken cancellationToken = default);
+
+    Task RegisterAsync(
+        RegisterDto register,
+        CancellationToken cancellationToken = default);
+
+    Task<TokenDto> RefreshTokenAsync(
+        string token,
+        CancellationToken cancellationToken = default);
+
+    Task ChangePasswordAsync(
+        string token,
+        ChangePasswordDto changePassword,
+        CancellationToken cancellationToken = default);
+}
+
+using MilligramClient.Api.Token;
+using MilligramClient.Domain.Dtos;
+using RestSharp;
+
+namespace MilligramClient.Api.Clients.Chats;
+
+public class ChatsClient : HttpClientBase, IChatsClient
+{
+	private readonly ITokenProvider _tokenProvider;
+
+	public ChatsClient(ITokenProvider tokenProvider, string address, TimeSpan timeout)
+		: base(address, timeout)
+	{
+		_tokenProvider = tokenProvider;
+	}
+
+	public Task<ChatDto[]> GetChatsAsync(
+		CancellationToken cancellationToken = default)
+	{
+		return _tokenProvider.ExecuteWithToken(token =>
+			SendRequestAsync<ChatDto[]>(
+				Method.Get,
+				"api/chats",
+				token,
+				cancellationToken));
+	}
+
+	public Task<ChatDto> GetChatAsync(Guid id,
+									  CancellationToken cancellationToken = default)
+	{
+		return _tokenProvider.ExecuteWithToken(token =>
+			SendRequestAsync<ChatDto>(
+				Method.Get,
+				"api/chats",
+				token,
+				cancellationToken));
+	}
+
+	public Task<ChatDto> CreateChatAsync(ChatDto newChat,
+										 CancellationToken cancellationToken = default)
+	{
+		return _tokenProvider.ExecuteWithToken(token =>
+			SendRequestAsync<ChatDto>(
+				Method.Post,
+				"api/chats",
+				token,
+				cancellationToken));
+	}
+
+	public Task<ChatDto> UpdateChatAsync(Guid id,
+										 ChatDto updatedChat,
+										 CancellationToken cancellationToken = default)
+	{
+		return _tokenProvider.ExecuteWithToken(token =>
+			SendRequestAsync<ChatDto>(
+				Method.Put,
+				"api/chats",
+				token,
+				cancellationToken));
+	}
+
+	public Task DeleteChatAsync(Guid id,
+								CancellationToken cancellationToken = default)
+	{
+		return _tokenProvider.ExecuteWithToken(token =>
+			SendRequestAsync(
+				Method.Delete,
+				"api/chats",
+				token,
+				cancellationToken));
+	}
+
+	public Task<UserDto[]> GetUsersAsync(
+		CancellationToken cancellationToken = default)
+	{
+		return _tokenProvider.ExecuteWithToken(token =>
+			SendRequestAsync<UserDto[]>(
+				Method.Get,
+				"api/chats",
+				token,
+				cancellationToken));
+	}
+
+	public Task<ChatDto> AddUserAsync(Guid idChat,
+									  Guid idUser,
+									  CancellationToken cancellationToken = default)
+	{
+		return _tokenProvider.ExecuteWithToken(token =>
+			SendRequestAsync<ChatDto>(
+				Method.Post,
+				"api/chats",
+				token,
+				cancellationToken));
+	}
+
+	public Task<ChatDto> DeleteUserAsync(Guid idChat,
+										 Guid idUser,
+										 CancellationToken cancellationToken = default)
+	{
+		return _tokenProvider.ExecuteWithToken(token =>
+			SendRequestAsync<ChatDto>(
+				Method.Delete,
+				"api/chats",
+				token,
+				cancellationToken));
+	}
+
+	public Task<MessageDto[]> GetMessagesAsync(Guid chatId,
+											   CancellationToken cancellationToken = default)
+	{
+		return _tokenProvider.ExecuteWithToken(token =>
+			SendRequestAsync<MessageDto[]>(
+				Method.Get,
+				$"api/chats/{chatId}/messages",
+				token,
+				cancellationToken));
+	}
+	public Task<MessageDto> GetMessageAsync(Guid chatId,
+											Guid messageId,
+											CancellationToken cancellationToken = default)
+	{
+		return _tokenProvider.ExecuteWithToken(token =>
+			SendRequestAsync<MessageDto>(
+				Method.Get,
+                $"api/chats/{chatId}/messages/{messageId}",
+				token,
+				cancellationToken));
+	}
+
+	public Task<MessageDto> AddMessageAsync(Guid chatId,
+											MessageDto messageDto,
+											CancellationToken cancellationToken = default)
+	{
+		return _tokenProvider.ExecuteWithToken(token =>
+			SendRequestAsync<MessageDto>(
+				Method.Post,
+				$"api/chats/{chatId}/messages",
+                token, 
+				request => request
+					.AddBody(messageDto),
+                cancellationToken));
+	}
+
+	public Task<MessageDto> UpdateMessageAsync(Guid chatId,
+											   Guid messageId,
+											   MessageDto messageDto,
+											   CancellationToken cancellationToken = default)
+	{
+		return _tokenProvider.ExecuteWithToken(token =>
+			SendRequestAsync<MessageDto>(
+				Method.Put,
+				"api/chats",
+				token,
+				cancellationToken));
+	}
+
+	public Task DeleteMessageAsync(Guid chatId,
+								   Guid messageId,
+								   CancellationToken cancellationToken = default)
+	{
+		return _tokenProvider.ExecuteWithToken(token =>
+			SendRequestAsync(
+				Method.Delete,
+				"api/chats",
+				token,
+				cancellationToken));
+	}
+}
+
+using MilligramClient.Domain.Dtos;
+
+namespace MilligramClient.Api.Clients.Chats;
+
+public interface IChatsClient
+{
+	Task<ChatDto[]> GetChatsAsync(CancellationToken cancellationToken = default);
+	Task<ChatDto> GetChatAsync(Guid id, CancellationToken cancellationToken = default);
+	Task<ChatDto> CreateChatAsync(ChatDto newChat, CancellationToken cancellationToken = default);
+	Task<ChatDto> UpdateChatAsync(Guid id, ChatDto updatedChat, CancellationToken cancellationToken = default);
+	Task DeleteChatAsync(Guid id, CancellationToken cancellationToken = default);
+	Task<UserDto[]> GetUsersAsync(CancellationToken cancellationToken = default);
+	Task<ChatDto> AddUserAsync(Guid idChat, Guid idUser, CancellationToken cancellationToken = default);
+	Task<ChatDto> DeleteUserAsync(Guid idChat, Guid idUser, CancellationToken cancellationToken = default);
+	Task<MessageDto[]> GetMessagesAsync(Guid chatId, CancellationToken cancellationToken = default);
+	Task<MessageDto> GetMessageAsync(Guid chatId, Guid messageId, CancellationToken cancellationToken = default);
+	Task<MessageDto> AddMessageAsync(Guid chatId, MessageDto messageDto, CancellationToken cancellationToken = default);
+	Task<MessageDto> UpdateMessageAsync(Guid chatId, Guid messageId, MessageDto messageDto, CancellationToken cancellationToken = default);
+	Task DeleteMessageAsync(Guid chatId, Guid messageId, CancellationToken cancellationToken = default);
+}
+
+using MilligramClient.Api.Token;
+using MilligramClient.Domain.Dtos;
+using RestSharp;
+
+namespace MilligramClient.Api.Clients.Contacts;
+
+public class ContactsClient : HttpClientBase, IContactsClient
+{
+	private readonly ITokenProvider _tokenProvider;
+
+	public ContactsClient(ITokenProvider tokenProvider, string address, TimeSpan timeout)
+		: base(address, timeout)
+	{
+		_tokenProvider = tokenProvider;
+	}
+
+	public Task<ContactDto[]> GetContactsAsync(
+		CancellationToken cancellationToken = default)
+	{
+		return _tokenProvider.ExecuteWithToken(token =>
+			SendRequestAsync<ContactDto[]>(
+				Method.Get,
+				"api/contacts",
+				token,
+				cancellationToken));
+	}
+
+	public Task<ContactDto> GetContactAsync(Guid id,
+											CancellationToken cancellationToken = default)
+	{
+		return _tokenProvider.ExecuteWithToken(token =>
+			SendRequestAsync<ContactDto>(
+				Method.Get,
+				"api/contacts",
+				token,
+				cancellationToken));
+	}
+
+	public Task<ContactDto> CreateContactAsync(ContactDto newContact,
+											   CancellationToken cancellationToken = default)
+	{
+		return _tokenProvider.ExecuteWithToken(token =>
+			SendRequestAsync<ContactDto>(
+				Method.Post,
+				"api/contacts",
+				token,
+				cancellationToken));
+	}
+
+	public Task<ContactDto> UpdateContactAsync(ContactDto updatedContact,
+											   CancellationToken cancellationToken = default)
+	{
+		return _tokenProvider.ExecuteWithToken(token =>
+			SendRequestAsync<ContactDto>(
+				Method.Put,
+				"api/contacts",
+				token,
+				cancellationToken));
+	}
+
+	public Task<ContactDto[]> FindContactAsync(string name,
+											   CancellationToken cancellationToken = default)
+	{
+		return _tokenProvider.ExecuteWithToken(token =>
+			SendRequestAsync<ContactDto[]>(
+				Method.Get,
+				"api/contacts",
+				token,
+				cancellationToken));
+	}
+
+	public Task DeleteContactsAsync(Guid id,
+									CancellationToken cancellationToken = default)
+	{
+		return _tokenProvider.ExecuteWithToken(token =>
+			SendRequestAsync(
+				Method.Delete,
+				"api/contacts",
+				token,
+				cancellationToken));
+	}
+}
+
+using MilligramClient.Domain.Dtos;
+
+namespace MilligramClient.Api.Clients.Contacts;
+
+public interface IContactsClient
+{
+    Task<ContactDto[]> GetContactsAsync(CancellationToken cancellationToken = default);
+    Task<ContactDto> GetContactAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<ContactDto[]> FindContactAsync(string name, CancellationToken cancellationToken = default);
+    Task<ContactDto> CreateContactAsync(ContactDto newContact, CancellationToken cancellationToken = default);
+    Task<ContactDto> UpdateContactAsync(ContactDto updatedContact, CancellationToken cancellationToken = default);
+    Task DeleteContactsAsync(Guid id, CancellationToken cancellationToken = default);
+}
+
+using System.Text.Json;
+using MilligramClient.Api.Exceptions;
+using MilligramClient.Common.Extensions;
+using RestSharp;
+using RestSharp.Authenticators;
+using RestSharp.Serializers.Json;
+
+namespace MilligramClient.Api.Clients;
+
+public abstract class HttpClientBase : IDisposable
+{
+    private readonly RestClient _client;
+
+    protected HttpClientBase(string address, TimeSpan timeout)
+    {
+        _client = new RestClient(address,
+            options => options.Timeout = timeout,
+            configureSerialization: config =>
+                config.UseSystemTextJson(
+                    new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                    }));
+    }
+
+    protected Task<byte[]> SendRequestAsync(
+        Method method,
+        string path,
+        CancellationToken cancellationToken)
+    {
+        return SendRequestAsync(method, path, null, null, cancellationToken);
+    }
+
+    protected Task<byte[]> SendRequestAsync(
+        Method method,
+        string path,
+        string? token,
+        CancellationToken cancellationToken)
+    {
+        return SendRequestAsync(method, path, token, null, cancellationToken);
+    }
+
+    protected Task<byte[]> SendRequestAsync(
+        Method method,
+        string path,
+        Action<RestRequest>? setRequestParams,
+        CancellationToken cancellationToken)
+    {
+        return SendRequestAsync(method, path, null, setRequestParams, cancellationToken);
+    }
+
+    protected async Task<byte[]> SendRequestAsync(
+        Method method,
+        string path,
+        string? token,
+        Action<RestRequest>? setRequestParams,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var request = CreateRequest(method, path, token, setRequestParams);
+        var response = await _client.ExecuteAsync(request, cancellationToken);
+
+        if (response.IsSuccessful && response.RawBytes?.Equals(null) == false)
+            return response.RawBytes;
+
+        var headers = response.Headers.EmptyIfNull().ToLookup(h => h.Name, h => h.Value);
+        throw new SendRequestException(response.ResponseUri, response.Content, response.StatusCode, headers!, response.ErrorException);
+    }
+
+    protected Task<TResult> SendRequestAsync<TResult>(
+        Method method,
+        string path,
+        CancellationToken cancellationToken)
+    {
+        return SendRequestAsync<TResult>(method, path, null, null, cancellationToken);
+    }
+
+    protected Task<TResult> SendRequestAsync<TResult>(
+        Method method,
+        string path,
+        string? token,
+        CancellationToken cancellationToken)
+    {
+        return SendRequestAsync<TResult>(method, path, token, null, cancellationToken);
+    }
+
+    protected Task<TResult> SendRequestAsync<TResult>(
+        Method method,
+        string path,
+        Action<RestRequest>? setRequestParams,
+        CancellationToken cancellationToken)
+    {
+        return SendRequestAsync<TResult>(method, path, null, setRequestParams, cancellationToken);
+    }
+
+    protected async Task<TResult> SendRequestAsync<TResult>(
+        Method method,
+        string path,
+        string? token,
+        Action<RestRequest>? setRequestParams,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var request = CreateRequest(method, path, token, setRequestParams);
+        var response = await _client.ExecuteAsync<TResult>(request, cancellationToken);
+
+        if (response.IsSuccessful && response.Data?.Equals(null) == false)
+            return response.Data;
+
+        var headers = response.Headers.EmptyIfNull().ToLookup(h => h.Name, h => h.Value);
+        throw new SendRequestException<TResult>(response.ResponseUri, response.Content, response.StatusCode, headers!, response.Data, response.ErrorException);
+    }
+
+    private static RestRequest CreateRequest(Method method, string resource, string? token, Action<RestRequest>? setRequestParams)
+    {
+        var request = new RestRequest(resource, method);
+
+        if (!token.IsNullOrWhiteSpace())
+            request.Authenticator = new JwtAuthenticator(token);
+
+        setRequestParams?.Invoke(request);
+        return request;
+    }
+
+    public void Dispose()
+    {
+        _client.Dispose();
+    }
+}
+
+namespace MilligramClient.Api.Clients.SendMessage;
+
+public interface ISendMessageClient
+{
+    Task<string> SendMessageAsync(string message, CancellationToken cancellationToken = default);
+    Task<string> GetChatMessagesAsync(Guid idChat, CancellationToken cancellationToken = default);
+    Task<string> DeleteMessagesAsync(string message, CancellationToken cancellationToken = default);
+}
+
+--- Файл: D:\Учеба\Академия Топ\Repositories\MilligramClient\MilligramClient.Api\Clients\SendMessage\SendMessageClient.cs ---
+
+using MilligramClient.Api.Token;
+using RestSharp;
+
+namespace MilligramClient.Api.Clients.SendMessage;
+
+public class SendMessageClient : HttpClientBase, ISendMessageClient
+{
+	private readonly ITokenProvider _tokenProvider;
+
+	public SendMessageClient(ITokenProvider tokenProvider, string address, TimeSpan timeout)
+		: base(address, timeout)
+	{
+		_tokenProvider = tokenProvider;
+	}
+
+	public Task<string> SendMessageAsync(
+		string message,
+		CancellationToken cancellationToken = default)
+	{
+		return _tokenProvider.ExecuteWithToken(token =>
+			SendRequestAsync<string>(
+				Method.Post,
+				"api/sendMessages",
+				token,
+				cancellationToken));
+	}
+
+	public Task<string> GetChatMessagesAsync(
+		Guid idChat,
+		CancellationToken cancellationToken = default)
+	{
+		return _tokenProvider.ExecuteWithToken(token =>
+			SendRequestAsync<string>(
+				Method.Get,
+				"api/getMessages",
+				token,
+				cancellationToken));
+	}
+
+	public Task<string> DeleteMessagesAsync(
+		string message,
+		CancellationToken cancellationToken = default)
+	{
+		return _tokenProvider.ExecuteWithToken(token =>
+			SendRequestAsync<string>(
+				Method.Get,
+				"api/deleteMessage",
+				token,
+				cancellationToken));
+	}
+}
+
+using System.Net;
+
+namespace MilligramClient.Api.Exceptions;
+
+public class SendRequestException : Exception
+{
+    public Uri? Uri { get; }
+    public string? Content { get; }
+    public HttpStatusCode StatusCode { get; }
+    public ILookup<string?, string?> Headers { get; }
+
+    public SendRequestException(
+        Uri? uri,
+        string? content,
+        HttpStatusCode statusCode,
+        ILookup<string?, string?> headers,
+        Exception? innerException)
+        : base($"Send request failed. Url: {uri}, StatusCode: {statusCode}", innerException)
+    {
+        Uri = uri;
+        Content = content;
+        StatusCode = statusCode;
+        Headers = headers;
+    }
+}
+
+using System.Net;
+
+namespace MilligramClient.Api.Exceptions;
+
+public class SendRequestException<TResponseData> : SendRequestException
+{
+    public TResponseData? ResponseData { get; }
+
+    public SendRequestException(
+        Uri? uri,
+        string? content,
+        HttpStatusCode statusCode,
+        ILookup<string?, string?> headers,
+        TResponseData? responseData,
+        Exception? innerException)
+        : base(uri, content, statusCode, headers, innerException)
+    {
+        ResponseData = responseData;
+    }
+}
+
+using MilligramClient.Common.Extensions;
+using RestSharp;
+
+namespace MilligramClient.Api.Extensions;
+
+public static class RestRequestExtensions
+{
+    public static RestRequest AddParameterIfNotNull<TValue>(this RestRequest request, string name, TValue value)
+    {
+        return value is not null ? request.AddParameter(name, value.ToString()) : request;
+    }
+
+    public static RestRequest AddParametersIfNotNull<TValue>(this RestRequest request, string name, IEnumerable<TValue>? values)
+    {
+        return values.EmptyIfNull().Aggregate(request, (restRequest, value) => restRequest.AddParameterIfNotNull(name, value));
+    }
+
+    public static RestRequest AddQueryParameterIfNotNull<TValue>(this RestRequest request, string name, TValue value)
+    {
+        return value is not null ? request.AddQueryParameter(name, value.ToString()) : request;
+    }
+
+    public static RestRequest AddQueryParametersIfNotNull<TValue>(this RestRequest request, string name, IEnumerable<TValue>? values)
+    {
+        return values.EmptyIfNull().Aggregate(request, (restRequest, value) => restRequest.AddQueryParameterIfNotNull(name, value));
+    }
+}
+
+using MilligramClient.Domain.Dtos;
+
+namespace MilligramClient.Api.Token;
+
+public interface ITokenProvider
+{
+	Task LoginAsync(LoginDto login);
+	Task LoginAsync(string token);
+	void Logout();
+
+	string GetToken();
+	string GetLoginFromToken();
+
+	Task<TResult> ExecuteWithToken<TResult>(Func<string, Task<TResult>> action);
+}
+
+using System.Diagnostics.CodeAnalysis;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using MilligramClient.Api.Clients.Account;
+using MilligramClient.Domain.Dtos;
+using Nito.AsyncEx;
+
+namespace MilligramClient.Api.Token;
+
+public class SlidingTokenProvider : ITokenProvider
+{
+    private readonly IAccountClient _accountClient;
+    private readonly int _refreshTokenBeforeExpirationInPercent;
+
+    private readonly AsyncLock _tokenAsyncLock = new();
+    private readonly JwtSecurityTokenHandler _jwtSecurityTokenHandler = new();
+
+    private string? _token;
+
+    public SlidingTokenProvider(
+        IAccountClient accountClient,
+        int refreshTokenBeforeExpirationInPercent)
+    {
+        _accountClient = accountClient;
+        _refreshTokenBeforeExpirationInPercent = refreshTokenBeforeExpirationInPercent;
+    }
+
+    public async Task LoginAsync(LoginDto login)
+    {
+        using var _ = await _tokenAsyncLock.LockAsync();
+
+        var loginResult = await _accountClient.LoginAsync(login).ConfigureAwait(false);
+        _token = loginResult.Token ?? throw new ArgumentNullException(nameof(loginResult.Token), "Token is empty");
+    }
+
+    public async Task LoginAsync(string token)
+    {
+        using var _ = await _tokenAsyncLock.LockAsync();
+
+        var refreshResult = await _accountClient.RefreshTokenAsync(token).ConfigureAwait(false);
+        _token = refreshResult.Token ?? throw new ArgumentNullException(nameof(refreshResult.Token), "Token is empty");
+    }
+
+    public void Logout()
+    {
+        _token = null;
+    }
+
+    public string GetToken()
+    {
+        return _token ?? throw new InvalidOperationException("You must login before using the token");
+    }
+
+    public string GetLoginFromToken()
+    {
+        var token = _token;
+
+        if (token == null)
+            throw new InvalidOperationException("You must login before using the token");
+
+        var jwtSecurityToken = _jwtSecurityTokenHandler.ReadJwtToken(token);
+
+        return jwtSecurityToken.Claims
+            .FirstOrDefault(claim => claim.Type == ClaimTypes.Name)
+            ?.Value ?? string.Empty;
+    }
+
+    public async Task<TResult> ExecuteWithToken<TResult>(Func<string, Task<TResult>> action)
+    {
+        return await action(await GetTokenAsync().ConfigureAwait(false)).ConfigureAwait(false);
+    }
+
+    private async Task<string> GetTokenAsync()
+    {
+        var token = _token;
+        if (!IsNeedRefreshToken(token))
+            return token;
+
+        using var _ = await _tokenAsyncLock.LockAsync();
+
+        if (!IsNeedRefreshToken(_token))
+            return _token;
+
+        var refreshResult = await _accountClient.RefreshTokenAsync(_token).ConfigureAwait(false);
+        _token = refreshResult.Token ?? throw new ArgumentNullException(nameof(refreshResult.Token), "Token is empty");
+
+        return _token;
+    }
+
+    private bool IsNeedRefreshToken([NotNull] string? token)
+    {
+        if (token == null)
+            throw new InvalidOperationException("You must login before using the token");
+
+        var jwtSecurityToken = _jwtSecurityTokenHandler.ReadJwtToken(token);
+
+        var refreshTokenBeforeTicks =
+            (jwtSecurityToken.ValidTo - jwtSecurityToken.ValidFrom).Ticks
+            / 100 * _refreshTokenBeforeExpirationInPercent;
+
+        var refreshTokenAfter = jwtSecurityToken.ValidTo.AddTicks(-refreshTokenBeforeTicks);
+
+        var utcNow = DateTime.UtcNow;
+        return refreshTokenAfter < utcNow && utcNow < jwtSecurityToken.ValidTo;
+    }
+}
+
+using System.Windows;
+
+namespace MilligramClient.Common.Wpf.Base;
+
+public interface IViewModel
+{
+	object Header { get; }
+	FrameworkElement View { get; }
+}
+
+using System.Windows;
+using GalaSoft.MvvmLight;
+
+namespace MilligramClient.Common.Wpf.Base;
+
+public abstract class ViewModel : ViewModelBase, IViewModel
+{
+	private FrameworkElement _view;
+
+	public abstract object Header { get; }
+
+	public virtual FrameworkElement View
+	{
+		get => _view;
+		set
+		{
+			if (Set(ref _view, value) && _view != null)
+				_view.DataContext = this;
+		}
+	}
+}
+
+using System.Windows;
+
+namespace MilligramClient.Common.Wpf.Base;
+
+public abstract class ViewModel<TView> : ViewModel where TView : FrameworkElement, new()
+{
+	public TView TypedView => (TView) View;
+
+	public override FrameworkElement View
+	{
+		get => base.View ??= new TView();
+		set => base.View = value;
+	}
+}
+
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Interactivity;
+
+namespace MilligramClient.Common.Wpf.Behaviors;
+
+public class DragMoveBehavior : Behavior<Window>
+{
+	protected override void OnAttached()
+	{
+		AssociatedObject.MouseMove += OnWindowMouseMove;
+	}
+
+	protected override void OnDetaching()
+	{
+		AssociatedObject.MouseMove -= OnWindowMouseMove;
+	}
+
+	private static void OnWindowMouseMove(object sender, MouseEventArgs e)
+	{
+		if (e.LeftButton != MouseButtonState.Pressed || sender is not Window window)
+			return;
+
+		try
+		{
+			if (window.WindowState == WindowState.Maximized)
+			{
+				window.WindowState = WindowState.Normal;
+				if (Application.Current.MainWindow != null)
+					Application.Current.MainWindow.Top = 3;
+			}
+
+			window.DragMove();
+		}
+		catch
+		{
+			// ignored
+		}
+	}
+}
+
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Interactivity;
+
+namespace MilligramClient.Common.Wpf.Behaviors;
+
+public class HandleContentElementMouseMoveBehavior : Behavior<ContentElement>
+{
+    protected override void OnAttached()
+    {
+        AssociatedObject.MouseMove += OnWindowMouseMove;
+    }
+
+    protected override void OnDetaching()
+    {
+        AssociatedObject.MouseMove -= OnWindowMouseMove;
+    }
+
+    private static void OnWindowMouseMove(object sender, MouseEventArgs e)
+    {
+        e.Handled = true;
+    }
+}
+
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Interactivity;
+
+namespace MilligramClient.Common.Wpf.Behaviors;
+
+public class HandleFrameworkElementMouseMoveBehavior : Behavior<FrameworkElement>
+{
+    protected override void OnAttached()
+    {
+        AssociatedObject.MouseMove += OnWindowMouseMove;
+    }
+
+    protected override void OnDetaching()
+    {
+        AssociatedObject.MouseMove -= OnWindowMouseMove;
+    }
+
+    private static void OnWindowMouseMove(object sender, MouseEventArgs e)
+    {
+        e.Handled = true;
+    }
+}
+
+using System.Diagnostics;
+using System.Windows;
+using System.Windows.Documents;
+using System.Windows.Navigation;
+
+namespace MilligramClient.Common.Wpf.Behaviors;
+
+public static class HyperlinkBehavior
+{
+    public static readonly DependencyProperty IsExternalProperty =
+        DependencyProperty.RegisterAttached(
+            "IsExternal",
+            typeof(bool),
+            typeof(HyperlinkBehavior),
+            new UIPropertyMetadata(false, OnIsExternalChanged));
+
+    public static bool GetIsExternal(DependencyObject obj)
+    {
+        return (bool) obj.GetValue(IsExternalProperty);
+    }
+
+    public static void SetIsExternal(DependencyObject obj, bool value)
+    {
+        obj.SetValue(IsExternalProperty, value);
+    }
+
+    private static void OnIsExternalChanged(object sender, DependencyPropertyChangedEventArgs args)
+    {
+        if (sender is not Hyperlink hyperlink)
+            return;
+
+        if ((bool) args.NewValue)
+            hyperlink.RequestNavigate += HyperlinkRequestNavigate;
+        else
+            hyperlink.RequestNavigate -= HyperlinkRequestNavigate;
+    }
+
+    private static void HyperlinkRequestNavigate(object sender, RequestNavigateEventArgs e)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(e.Uri.ToString()));
+        }
+        catch
+        {
+            // ignored
+        }
+
+        e.Handled = true;
+    }
+}
+
+using System.Windows.Input;
+using MilligramClient.Common.Extensions;
+
+namespace MilligramClient.Common.Wpf.Commands;
+
+public class AsyncRelayCommand : ICommand
+{
+	public event EventHandler? CanExecuteChanged
+	{
+		add => CommandManager.RequerySuggested += value;
+		remove => CommandManager.RequerySuggested -= value;
+	}
+
+	private readonly Func<Task> _execute;
+	private readonly Func<bool>? _canExecute;
+
+	private long _isExecuting;
+
+	public AsyncRelayCommand(Func<Task> execute, Func<bool>? canExecute = null)
+	{
+		_execute = execute ?? throw new ArgumentNullException(nameof(execute));
+		_canExecute = canExecute;
+	}
+
+	public void RaiseCanExecuteChanged()
+	{
+		CommandManager.InvalidateRequerySuggested();
+	}
+
+	public bool CanExecute(object? parameter)
+	{
+		return _canExecute == null || (Interlocked.Read(ref _isExecuting) == 0 && _canExecute());
+	}
+
+	public void Execute(object? parameter)
+	{
+		ExecuteAsync(parameter).FireAndForgetSafeAsync();
+	}
+
+	private async Task ExecuteAsync(object? parameter)
+	{
+		if (!CanExecute(parameter))
+			return;
+
+		Interlocked.Exchange(ref _isExecuting, 1);
+		RaiseCanExecuteChanged();
+
+		try
+		{
+			await _execute().ConfigureAwait(false);
+		}
+		finally
+		{
+			Interlocked.Exchange(ref _isExecuting, 0);
+			RaiseCanExecuteChanged();
+		}
+	}
+}
+
+using System.Windows.Input;
+using MilligramClient.Common.Extensions;
+
+namespace MilligramClient.Common.Wpf.Commands;
+
+public class AsyncRelayCommand<T> : ICommand
+{
+	public event EventHandler? CanExecuteChanged
+	{
+		add => CommandManager.RequerySuggested += value;
+		remove => CommandManager.RequerySuggested -= value;
+	}
+
+	private readonly Func<T?, Task> _execute;
+	private readonly Func<T?, bool>? _canExecute;
+
+	private long _isExecuting;
+
+	public AsyncRelayCommand(Func<T?, Task> execute, Func<T?, bool>? canExecute = null)
+	{
+		_execute = execute ?? throw new ArgumentNullException(nameof(execute));
+		_canExecute = canExecute;
+	}
+
+	public void RaiseCanExecuteChanged()
+	{
+		CommandManager.InvalidateRequerySuggested();
+	}
+
+	public bool CanExecute(object? parameter)
+	{
+		if (_canExecute == null)
+			return true;
+
+		if (Interlocked.Read(ref _isExecuting) != 0)
+			return false;
+
+		if (parameter == null)
+			return _canExecute(default);
+
+		if (parameter.GetType() != typeof(T) && parameter is IConvertible)
+			return _canExecute((T) Convert.ChangeType(parameter, typeof(T), null));
+
+		if (parameter is T t)
+			return _canExecute(t);
+
+		return false;
+	}
+
+	public void Execute(object? parameter)
+	{
+		ExecuteAsync(parameter).FireAndForgetSafeAsync();
+	}
+
+	private async Task ExecuteAsync(object? parameter)
+	{
+		if (!CanExecute(parameter))
+			return;
+
+		Interlocked.Exchange(ref _isExecuting, 1);
+		RaiseCanExecuteChanged();
+
+		try
+		{
+			if (parameter == null)
+				await _execute(default).ConfigureAwait(false);
+			else if (parameter.GetType() != typeof(T) && parameter is IConvertible)
+				await _execute((T) Convert.ChangeType(parameter, typeof(T), null)).ConfigureAwait(false);
+			else if (parameter is T t)
+				await _execute(t).ConfigureAwait(false);
+		}
+		finally
+		{
+			Interlocked.Exchange(ref _isExecuting, 0);
+			RaiseCanExecuteChanged();
+		}
+	}
+}
+
+--- Файл: D:\Учеба\Академия Топ\Repositories\MilligramClient\MilligramClient.Common.Wpf\Controls\CircleSpinner.xaml ---
+
+<UserControl x:Class="MilligramClient.Common.Wpf.Controls.CircleSpinner"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 mc:Ignorable="d"
+			 d:DesignHeight="300" d:DesignWidth="300">
+	<UserControl.Resources>
+		<Style x:Key="BusyAnimationStyle" TargetType="Control">
+			<Setter Property="Background" Value="#7F000000" />
+
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="Control">
+						<ControlTemplate.Resources>
+							<Storyboard x:Key="Spinner" RepeatBehavior="Forever" BeginTime="00:00:00.0" Duration="00:00:01.2">
+								<DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="Ellipse01" Storyboard.TargetProperty="(UIElement.Opacity)">
+									<EasingDoubleKeyFrame KeyTime="00:00:00" Value="1" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.1000000" Value="0.5" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.2000000" Value="0.25" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.3000000" Value="0" />
+									<EasingDoubleKeyFrame KeyTime="00:00:01.1000000" Value="0" />
+									<EasingDoubleKeyFrame KeyTime="00:00:01.2000000" Value="1" />
+								</DoubleAnimationUsingKeyFrames>
+								<DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="Ellipse02" Storyboard.TargetProperty="(UIElement.Opacity)">
+									<EasingDoubleKeyFrame KeyTime="00:00:00.0000000" Value="0" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.1000000" Value="1" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.2000000" Value="0.5" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.3000000" Value="0.25" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.4000000" Value="0" />
+								</DoubleAnimationUsingKeyFrames>
+								<DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="Ellipse03" Storyboard.TargetProperty="(UIElement.Opacity)">
+									<EasingDoubleKeyFrame KeyTime="00:00:00.1000000" Value="0" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.2000000" Value="1" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.3000000" Value="0.5" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.4000000" Value="0.25" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.5000000" Value="0" />
+								</DoubleAnimationUsingKeyFrames>
+								<DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="Ellipse04" Storyboard.TargetProperty="(UIElement.Opacity)">
+									<EasingDoubleKeyFrame KeyTime="00:00:00.0000000" Value="0" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.2000000" Value="0" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.3000000" Value="1" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.4000000" Value="0.5" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.5000000" Value="0.25" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.6000000" Value="0" />
+								</DoubleAnimationUsingKeyFrames>
+								<DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="Ellipse05" Storyboard.TargetProperty="(UIElement.Opacity)">
+									<EasingDoubleKeyFrame KeyTime="00:00:00.0000000" Value="0" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.3000000" Value="0" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.4000000" Value="1" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.5000000" Value="0.5" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.6000000" Value="0.25" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.7000000" Value="0" />
+								</DoubleAnimationUsingKeyFrames>
+								<DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="Ellipse06" Storyboard.TargetProperty="(UIElement.Opacity)">
+									<EasingDoubleKeyFrame KeyTime="00:00:00.0000000" Value="0" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.4000000" Value="0" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.5000000" Value="1" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.6000000" Value="0.5" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.7000000" Value="0.25" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.8000000" Value="0" />
+								</DoubleAnimationUsingKeyFrames>
+								<DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="Ellipse07" Storyboard.TargetProperty="(UIElement.Opacity)">
+									<EasingDoubleKeyFrame KeyTime="00:00:00.0000000" Value="0" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.5000000" Value="0" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.6000000" Value="1" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.7000000" Value="0.5" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.8000000" Value="0.25" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.9000000" Value="0" />
+								</DoubleAnimationUsingKeyFrames>
+								<DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="Ellipse08" Storyboard.TargetProperty="(UIElement.Opacity)">
+									<EasingDoubleKeyFrame KeyTime="00:00:00.0000000" Value="0" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.6000000" Value="0" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.7000000" Value="1" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.8000000" Value="0.5" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.9000000" Value="0.25" />
+									<EasingDoubleKeyFrame KeyTime="00:00:01" Value="0" />
+								</DoubleAnimationUsingKeyFrames>
+								<DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="Ellipse09" Storyboard.TargetProperty="(UIElement.Opacity)">
+									<EasingDoubleKeyFrame KeyTime="00:00:00.0000000" Value="0" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.7000000" Value="0" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.8000000" Value="1" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.9000000" Value="0.5" />
+									<EasingDoubleKeyFrame KeyTime="00:00:01" Value="0.25" />
+									<EasingDoubleKeyFrame KeyTime="00:00:01.1000000" Value="0" />
+								</DoubleAnimationUsingKeyFrames>
+								<DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="Ellipse10" Storyboard.TargetProperty="(UIElement.Opacity)">
+									<EasingDoubleKeyFrame KeyTime="00:00:00.0000000" Value="0" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.8000000" Value="0" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.9000000" Value="1" />
+									<EasingDoubleKeyFrame KeyTime="00:00:01" Value="0.5" />
+									<EasingDoubleKeyFrame KeyTime="00:00:01.1000000" Value="0.25" />
+									<EasingDoubleKeyFrame KeyTime="00:00:01.2000000" Value="0" />
+								</DoubleAnimationUsingKeyFrames>
+								<DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="Ellipse11" Storyboard.TargetProperty="(UIElement.Opacity)">
+									<EasingDoubleKeyFrame KeyTime="00:00:00" Value="0.25" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.1000000" Value="0" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.9000000" Value="0" />
+									<EasingDoubleKeyFrame KeyTime="00:00:01" Value="1" />
+									<EasingDoubleKeyFrame KeyTime="00:00:01.1000000" Value="0.5" />
+									<EasingDoubleKeyFrame KeyTime="00:00:01.2000000" Value="0.25" />
+								</DoubleAnimationUsingKeyFrames>
+								<DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="Ellipse12" Storyboard.TargetProperty="(UIElement.Opacity)">
+									<EasingDoubleKeyFrame KeyTime="00:00:00" Value="0.5" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.1000000" Value="0.25" />
+									<EasingDoubleKeyFrame KeyTime="00:00:00.2000000" Value="0" />
+									<EasingDoubleKeyFrame KeyTime="00:00:01" Value="0" />
+									<EasingDoubleKeyFrame KeyTime="00:00:01.1000000" Value="1" />
+									<EasingDoubleKeyFrame KeyTime="00:00:01.2000000" Value="0.5" />
+								</DoubleAnimationUsingKeyFrames>
+							</Storyboard>
+						</ControlTemplate.Resources>
+
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsVisible" Value="True">
+								<Trigger.EnterActions>
+									<BeginStoryboard Storyboard="{StaticResource Spinner}" x:Name="SpinnerStoryboard" />
+								</Trigger.EnterActions>
+
+								<Trigger.ExitActions>
+									<StopStoryboard BeginStoryboardName="SpinnerStoryboard" />
+								</Trigger.ExitActions>
+							</Trigger>
+						</ControlTemplate.Triggers>
+
+						<Canvas Height="24" Width="24">
+							<Canvas.Resources>
+								<Style TargetType="Ellipse">
+									<Setter Property="Width" Value="4" />
+									<Setter Property="Height" Value="4" />
+									<Setter Property="Opacity" Value="0" />
+									<Setter Property="Fill" Value="White" />
+								</Style>
+							</Canvas.Resources>
+
+							<Ellipse x:Name="Ellipse01" Canvas.Top="10" />
+							<Ellipse x:Name="Ellipse02" Canvas.Top="5" Canvas.Left="1.33975" />
+							<Ellipse x:Name="Ellipse03" Canvas.Top="1.4" Canvas.Left="5" />
+							<Ellipse x:Name="Ellipse04" Canvas.Top="0" Canvas.Left="10" />
+							<Ellipse x:Name="Ellipse05" Canvas.Top="1.4" Canvas.Left="15" />
+							<Ellipse x:Name="Ellipse06" Canvas.Top="5" Canvas.Left="18.6603" />
+							<Ellipse x:Name="Ellipse07" Canvas.Top="10" Canvas.Left="20" />
+							<Ellipse x:Name="Ellipse08" Canvas.Top="15" Canvas.Left="18.7" />
+							<Ellipse x:Name="Ellipse09" Canvas.Top="18.66025" Canvas.Left="15" />
+							<Ellipse x:Name="Ellipse10" Canvas.Top="20" Canvas.Left="10" />
+							<Ellipse x:Name="Ellipse11" Canvas.Top="18.66025" Canvas.Left="5" />
+							<Ellipse x:Name="Ellipse12" Canvas.Top="15" Canvas.Left="1.4" />
+						</Canvas>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+	</UserControl.Resources>
+
+	<Control Style="{StaticResource BusyAnimationStyle}" />
+</UserControl>
+
+namespace MilligramClient.Common.Wpf.Controls;
+
+public partial class CircleSpinner
+{
+	public CircleSpinner()
+	{
+		InitializeComponent();
+	}
+}
+
+using System.Globalization;
+using System.Windows;
+using System.Windows.Data;
+using System.Windows.Markup;
+
+namespace MilligramClient.Common.Wpf.Converters.Base;
+
+[MarkupExtensionReturnType(typeof(IValueConverter))]
+public abstract class MarkupConverterBase : MarkupExtension, IValueConverter
+{
+	public override object ProvideValue(IServiceProvider serviceProvider)
+	{
+		return this;
+	}
+
+	protected abstract object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture);
+	protected abstract object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture);
+
+	object? IValueConverter.Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+	{
+		try
+		{
+			return Convert(value, targetType, parameter, culture);
+		}
+		catch
+		{
+			return DependencyProperty.UnsetValue;
+		}
+	}
+
+	object? IValueConverter.ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+	{
+		try
+		{
+			return ConvertBack(value, targetType, parameter, culture);
+		}
+		catch
+		{
+			return DependencyProperty.UnsetValue;
+		}
+	}
+}
+
+using System.Globalization;
+using System.Windows;
+using System.Windows.Data;
+using System.Windows.Markup;
+
+namespace MilligramClient.Common.Wpf.Converters.Base;
+
+[MarkupExtensionReturnType(typeof(IMultiValueConverter))]
+public abstract class MarkupMultiValueConverterBase : MarkupExtension, IMultiValueConverter
+{
+	public override object ProvideValue(IServiceProvider serviceProvider)
+	{
+		return this;
+	}
+
+	protected abstract object Convert(object[]? values, Type targetType, object? parameter, CultureInfo culture);
+	protected abstract object[] ConvertBack(object? value, Type[] targetTypes, object? parameter, CultureInfo culture);
+
+	object? IMultiValueConverter.Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+	{
+		try
+		{
+			return Convert(values, targetType, parameter, culture);
+		}
+		catch
+		{
+			return DependencyProperty.UnsetValue;
+		}
+	}
+
+	object[]? IMultiValueConverter.ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+	{
+		try
+		{
+			return ConvertBack(value, targetTypes, parameter, culture);
+		}
+		catch
+		{
+			return null;
+		}
+	}
+}
+
+using System.Globalization;
+using System.Windows;
+using MilligramClient.Common.Wpf.Converters.Base;
+
+namespace MilligramClient.Common.Wpf.Converters;
+
+public class BoolToBoldFontWeightConverter : MarkupConverterBase
+{
+	protected override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+	{
+		return value is bool boolValue ? boolValue ? FontWeights.Bold : FontWeights.Normal : throw new ArgumentException($"{nameof(PercentToDoubleConverter)} only for bool values");
+	}
+
+	protected override object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+	{
+		throw new NotImplementedException();
+	}
+}
+
+using System.Globalization;
+using System.Windows;
+using System.Windows.Data;
+using System.Windows.Markup;
+using MilligramClient.Common.Wpf.Converters.Base;
+
+namespace MilligramClient.Common.Wpf.Converters;
+
+public class BoolToVisibilityConverter : MarkupConverterBase
+{
+	[ConstructorArgument("TrueValue")]
+	public Visibility TrueValue { get; set; }
+
+	[ConstructorArgument("FalseValue")]
+	public Visibility FalseValue { get; set; }
+
+	[ConstructorArgument("NullValue")]
+	public Visibility NullValue { get; set; }
+
+	public BoolToVisibilityConverter()
+	{
+		TrueValue = Visibility.Visible;
+		FalseValue = Visibility.Collapsed;
+		NullValue = Visibility.Collapsed;
+	}
+
+	protected override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+	{
+		if (value == null)
+			return NullValue;
+
+		if (value is not bool valueBool)
+			return Binding.DoNothing;
+
+		return valueBool ? TrueValue : FalseValue;
+	}
+
+	protected override object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+	{
+		if (Equals(value, null))
+			return null;
+
+		if (Equals(value, TrueValue))
+			return true;
+
+		if (Equals(value, FalseValue))
+			return false;
+
+		return Binding.DoNothing;
+	}
+}
+
+using System.Collections;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Markup;
+using MilligramClient.Common.Wpf.Converters.Base;
+
+namespace MilligramClient.Common.Wpf.Converters;
+
+public class EnumToVisibilityConverter : MarkupConverterBase
+{
+    [ConstructorArgument("Inverse")]
+    public bool Inverse { get; set; }
+
+    [ConstructorArgument("UseHidden")]
+    public bool UseHidden { get; set; }
+
+    public EnumToVisibilityConverter()
+    {
+        Inverse = false;
+        UseHidden = false;
+    }
+
+    protected override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (parameter == null)
+            throw new InvalidOperationException("You must pass enum value as parameter");
+
+        var isVisible = value != null && (value.Equals(parameter) || (parameter is ICollection collection && collection.Cast<object>().Contains(value))) ? !Inverse : Inverse;
+        return isVisible ? Visibility.Visible : UseHidden ? Visibility.Hidden : Visibility.Collapsed;
+    }
+
+    protected override object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+using System.Globalization;
+using MilligramClient.Common.Wpf.Converters.Base;
+
+namespace MilligramClient.Common.Wpf.Converters;
+
+public class PercentToDoubleConverter : MarkupConverterBase
+{
+	protected override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+	{
+		return value is int intValue ? intValue / 100.0 : throw new ArgumentException($"{nameof(PercentToDoubleConverter)} only for int values");
+	}
+
+	protected override object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+	{
+		throw new NotImplementedException();
+	}
+}
+
+using System.Globalization;
+using System.Windows;
+using System.Windows.Markup;
+using MilligramClient.Common.Wpf.Converters.Base;
+
+namespace MilligramClient.Common.Wpf.Converters;
+
+public class StringEmptyToVisibilityConverter : MarkupConverterBase
+{
+    [ConstructorArgument("Inverse")]
+    public bool Inverse { get; set; }
+
+    [ConstructorArgument("UseHidden")]
+    public bool UseHidden { get; set; }
+
+    public StringEmptyToVisibilityConverter()
+    {
+        Inverse = false;
+    }
+
+    protected override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return string.IsNullOrEmpty(value?.ToString())
+            ? Inverse
+                ? Visibility.Visible
+                : UseHidden
+                    ? Visibility.Hidden
+                    : Visibility.Collapsed
+            : Inverse
+                ? UseHidden
+                    ? Visibility.Hidden
+                    : Visibility.Collapsed
+                : Visibility.Visible;
+    }
+
+    protected override object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+using System.Windows.Threading;
+using GalaSoft.MvvmLight.Threading;
+
+namespace MilligramClient.Common.Wpf.Dispatcher;
+
+public class DispatcherHelperAdapter : IDispatcherHelper
+{
+	public System.Windows.Threading.Dispatcher UiDispatcher => DispatcherHelper.UIDispatcher;
+
+	public DispatcherHelperAdapter()
+	{
+		DispatcherHelper.Initialize();
+	}
+
+	public void CheckBeginInvokeOnUI(Action action)
+	{
+		DispatcherHelper.CheckBeginInvokeOnUI(action);
+	}
+
+	public DispatcherOperation RunAsync(Action action)
+	{
+		return DispatcherHelper.RunAsync(action);
+	}
+
+	public void Reset()
+	{
+		DispatcherHelper.Reset();
+	}
+}
+
+using System.Windows.Threading;
+
+namespace MilligramClient.Common.Wpf.Dispatcher;
+
+public interface IDispatcherHelper
+{
+	System.Windows.Threading.Dispatcher UiDispatcher { get; }
+
+	void CheckBeginInvokeOnUI(Action action);
+	DispatcherOperation RunAsync(Action action);
+	void Reset();
+}
+
+using System.Windows;
+using System.Windows.Controls;
+
+namespace MilligramClient.Common.Wpf.Helpers;
+
+public static class PasswordHelper
+{
+    public static readonly DependencyProperty PasswordProperty =
+        DependencyProperty.RegisterAttached("Password",
+            typeof(string),
+            typeof(PasswordHelper),
+            new FrameworkPropertyMetadata(string.Empty, OnPasswordPropertyChanged));
+
+    public static readonly DependencyProperty AttachProperty =
+        DependencyProperty.RegisterAttached("Attach",
+            typeof(bool),
+            typeof(PasswordHelper),
+            new PropertyMetadata(false, Attach));
+
+    private static readonly DependencyProperty IsUpdatingProperty =
+        DependencyProperty.RegisterAttached("IsUpdating",
+            typeof(bool),
+            typeof(PasswordHelper));
+
+
+    public static void SetAttach(DependencyObject dp, bool value)
+    {
+        dp.SetValue(AttachProperty, value);
+    }
+
+    public static bool GetAttach(DependencyObject dp)
+    {
+        return (bool) dp.GetValue(AttachProperty);
+    }
+
+    public static string GetPassword(DependencyObject dp)
+    {
+        return (string) dp.GetValue(PasswordProperty);
+    }
+
+    public static void SetPassword(DependencyObject dp, string value)
+    {
+        dp.SetValue(PasswordProperty, value);
+    }
+
+    private static bool GetIsUpdating(DependencyObject dp)
+    {
+        return (bool) dp.GetValue(IsUpdatingProperty);
+    }
+
+    private static void SetIsUpdating(DependencyObject dp, bool value)
+    {
+        dp.SetValue(IsUpdatingProperty, value);
+    }
+
+    private static void OnPasswordPropertyChanged(
+        DependencyObject sender,
+        DependencyPropertyChangedEventArgs e)
+    {
+        var passwordBox = sender as PasswordBox;
+        passwordBox.PasswordChanged -= PasswordChanged;
+
+        if (!GetIsUpdating(passwordBox))
+            passwordBox.Password = (string) e.NewValue;
+        passwordBox.PasswordChanged += PasswordChanged;
+    }
+
+    private static void Attach(
+        DependencyObject sender,
+        DependencyPropertyChangedEventArgs e)
+    {
+        if (sender is not PasswordBox passwordBox)
+            return;
+
+        if ((bool) e.OldValue)
+            passwordBox.PasswordChanged -= PasswordChanged;
+
+        if ((bool) e.NewValue)
+            passwordBox.PasswordChanged += PasswordChanged;
+    }
+
+    private static void PasswordChanged(object sender, RoutedEventArgs e)
+    {
+        var passwordBox = sender as PasswordBox;
+        SetIsUpdating(passwordBox, true);
+        SetPassword(passwordBox, passwordBox.Password);
+        SetIsUpdating(passwordBox, false);
+    }
+}
+
+using System.Windows;
+
+namespace MilligramClient.Common.Wpf.MessageBox;
+
+public interface IMessageBoxService
+{
+	public void Show(string text);
+	public void Show(string text, string caption);
+	public void Show(string text, string caption, MessageBoxButton button);
+	public void Show(string text, string caption, MessageBoxButton button, MessageBoxImage image);
+	public void Show(string text, string caption, MessageBoxButton button, MessageBoxImage image, MessageBoxResult defaultResult);
+	public void Show(string text, string caption, MessageBoxButton button, MessageBoxImage image, MessageBoxResult defaultResult, MessageBoxOptions options);
+}
+
+--- Файл: D:\Учеба\Академия Топ\Repositories\MilligramClient\MilligramClient.Common.Wpf\MessageBox\MessageBoxService.cs ---
+
+using System.Windows;
+
+namespace MilligramClient.Common.Wpf.MessageBox;
+
+public class MessageBoxService : IMessageBoxService
+{
+	public void Show(string text)
+	{
+		System.Windows.MessageBox.Show(text);
+	}
+
+	public void Show(string text, string caption)
+	{
+		System.Windows.MessageBox.Show(text, caption);
+	}
+
+	public void Show(string text, string caption, MessageBoxButton button)
+	{
+		System.Windows.MessageBox.Show(text, caption, button);
+	}
+
+	public void Show(string text, string caption, MessageBoxButton button, MessageBoxImage image)
+	{
+		System.Windows.MessageBox.Show(text, caption, button, image);
+	}
+
+	public void Show(string text, string caption, MessageBoxButton button, MessageBoxImage image, MessageBoxResult defaultResult)
+	{
+		System.Windows.MessageBox.Show(text, caption, button, image, defaultResult);
+	}
+
+	public void Show(string text, string caption, MessageBoxButton button, MessageBoxImage image, MessageBoxResult defaultResult, MessageBoxOptions options)
+	{
+		System.Windows.MessageBox.Show(text, caption, button, image, defaultResult, options);
+	}
+}
+
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Messaging;
+
+namespace MilligramClient.Common.Wpf.Messages;
+
+public class RequestCloseMessage : MessageBase
+{
+	public ViewModelBase ViewModel { get; }
+	public bool? DialogResult { get; }
+
+	public RequestCloseMessage(ViewModelBase viewModel, bool? dialogResult = null)
+	{
+		ViewModel = viewModel;
+		DialogResult = dialogResult;
+	}
+}
+
+namespace MilligramClient.Common.Wpf.Messages
+{
+    public class UsernameChangeMessage
+    {
+		public string CurrentUsername { get; }
+		public string NewUsername { get; }
+
+		public UsernameChangeMessage(string currentUsername, string newUsername)
+		{
+			CurrentUsername = currentUsername;
+			NewUsername = newUsername;
+		}
+    }
+}
+
+
+namespace MilligramClient.Common.Wpf.Controls {
+    
+    
+    /// <summary>
+    /// CircleSpinner
+    /// </summary>
+    public partial class CircleSpinner : System.Windows.Controls.UserControl, System.Windows.Markup.IComponentConnector {
+        
+        private bool _contentLoaded;
+        
+        /// <summary>
+        /// InitializeComponent
+        /// </summary>
+        [System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("PresentationBuildTasks", "9.0.6.0")]
+        public void InitializeComponent() {
+            if (_contentLoaded) {
+                return;
+            }
+            _contentLoaded = true;
+            System.Uri resourceLocater = new System.Uri("/MilligramClient.Common.Wpf;component/controls/circlespinner.xaml", System.UriKind.Relative);
+            
+            #line 1 "..\..\..\..\Controls\CircleSpinner.xaml"
+            System.Windows.Application.LoadComponent(this, resourceLocater);
+            
+            #line default
+            #line hidden
+        }
+        
+        [System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("PresentationBuildTasks", "9.0.6.0")]
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]
+        [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
+        void System.Windows.Markup.IComponentConnector.Connect(int connectionId, object target) {
+            this._contentLoaded = true;
+        }
+    }
+}
+
+namespace MilligramClient.Common.Wpf.Controls {
+    
+    
+    /// <summary>
+    /// CircleSpinner
+    /// </summary>
+    public partial class CircleSpinner : System.Windows.Controls.UserControl, System.Windows.Markup.IComponentConnector {
+        
+        private bool _contentLoaded;
+        
+        /// <summary>
+        /// InitializeComponent
+        /// </summary>
+        [System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("PresentationBuildTasks", "9.0.6.0")]
+        public void InitializeComponent() {
+            if (_contentLoaded) {
+                return;
+            }
+            _contentLoaded = true;
+            System.Uri resourceLocater = new System.Uri("/MilligramClient.Common.Wpf;V1.0.0.0;component/controls/circlespinner.xaml", System.UriKind.Relative);
+            
+            #line 1 "..\..\..\..\Controls\CircleSpinner.xaml"
+            System.Windows.Application.LoadComponent(this, resourceLocater);
+            
+            #line default
+            #line hidden
+        }
+        
+        [System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("PresentationBuildTasks", "9.0.6.0")]
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]
+        [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
+        void System.Windows.Markup.IComponentConnector.Connect(int connectionId, object target) {
+            this._contentLoaded = true;
+        }
+    }
+}
+
+using System.Windows;
+using MilligramClient.Common.Wpf.Base;
+
+namespace MilligramClient.Common.Wpf.View;
+
+public interface IViewService
+{
+	void OpenWindow<TViewModel>() where TViewModel : IViewModel;
+	void OpenWindow(IViewModel viewModel);
+
+	bool? OpenDialog<TViewModel>() where TViewModel : IViewModel;
+	[Obsolete("Use ViewModelExtensions")]
+	bool? OpenDialog(IViewModel viewModel);
+
+	Window CreateWindow<TViewModel>(WindowMode windowMode) where TViewModel : IViewModel;
+	Window CreateWindow(IViewModel viewModel, WindowMode windowMode);
+
+	int GetOpenedWindowsCount();
+}
+
+using System.Diagnostics;
+using System.Windows;
+using GalaSoft.MvvmLight.Messaging;
+using Grace.DependencyInjection;
+using MilligramClient.Common.Wpf.Base;
+using MilligramClient.Common.Wpf.Messages;
+
+namespace MilligramClient.Common.Wpf.View;
+
+public class ViewService : IViewService
+{
+    private readonly ILocatorService _locatorService;
+    private readonly List<Window> _openedWindows;
+
+    public ViewService(IMessenger messenger, ILocatorService locatorService)
+    {
+        _locatorService = locatorService;
+        _openedWindows = new List<Window>();
+
+        // Listen for the close event
+        messenger.Register<RequestCloseMessage>(this, OnRequestClose);
+    }
+
+    [DebuggerStepThrough]
+    public void OpenWindow<TViewModel>() where TViewModel : IViewModel
+    {
+        // Create window for that view tabModel.
+        var window = CreateWindow<TViewModel>(WindowMode.Window);
+
+        // Open the window.
+        window.Show();
+    }
+
+    [DebuggerStepThrough]
+    public void OpenWindow(IViewModel viewModel)
+    {
+        // Create window for that view tabModel.
+        var window = CreateWindow(viewModel, WindowMode.Window);
+
+        // Open the window.
+        window.Show();
+    }
+
+    [DebuggerStepThrough]
+    public bool? OpenDialog<TViewModel>() where TViewModel : IViewModel
+    {
+        // Create window for that viewModel.
+        var window = CreateWindow<TViewModel>(WindowMode.Dialog);
+
+        // Open the window and return the result.
+        return window.ShowDialog();
+    }
+
+    [DebuggerStepThrough]
+    public bool? OpenDialog(IViewModel viewModel)
+    {
+        // Create window for that viewModel.
+        var window = CreateWindow(viewModel, WindowMode.Dialog);
+
+        // Open the window and return the result.
+        return window.ShowDialog();
+    }
+
+    [DebuggerStepThrough]
+    public Window CreateWindow<TViewModel>(WindowMode windowMode) where TViewModel : IViewModel
+    {
+        var viewModel = _locatorService.Locate<TViewModel>();
+
+        return CreateWindow(viewModel, windowMode);
+    }
+
+    [DebuggerStepThrough]
+    public Window CreateWindow(IViewModel viewModel, WindowMode windowMode)
+    {
+        var window = viewModel.View as Window;
+        ArgumentNullException.ThrowIfNull(window);
+
+        window.DataContext = viewModel;
+        window.Closed += OnClosed;
+
+        lock (_openedWindows)
+        {
+            // Last window opened is considered the 'owner' of the window.
+            // May not be 100% correct in some situations but it is more
+            // then good enough for handling dialog windows
+            if (windowMode == WindowMode.Dialog && _openedWindows.Any())
+            {
+                var lastOpened = _openedWindows.Last();
+                if (lastOpened.IsActive && !Equals(window, lastOpened))
+                    window.Owner = lastOpened;
+            }
+
+            _openedWindows.Add(window);
+        }
+
+        return window;
+    }
+
+    public int GetOpenedWindowsCount()
+    {
+        lock (_openedWindows)
+            return _openedWindows.Count;
+    }
+
+    private void OnRequestClose(RequestCloseMessage message)
+    {
+        var window = _openedWindows.SingleOrDefault(w => w.DataContext == message.ViewModel);
+        if (window == null)
+            return;
+
+        if (message.DialogResult != null)
+            window.DialogResult = message.DialogResult;
+        else
+            window.Close();
+    }
+
+    private void OnClosed(object? sender, EventArgs e)
+    {
+        var window = sender as Window;
+        ArgumentNullException.ThrowIfNull(window);
+
+        window.Closed -= OnClosed;
+
+        lock (_openedWindows)
+            _openedWindows.Remove(window);
+    }
+}
+
+namespace MilligramClient.Common.Wpf.View;
+
+public enum WindowMode
+{
+	Dialog,
+	Window
+}
+
+namespace MilligramClient.Common;
+
+public static class Constants
+{
+	public const string ServerAddress = "http://192.168.3.80:18690";
+	public static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(30);
+
+	public const int RefreshSlidingTokenBeforeExpirationInPercent = 50;
+
+	public const string RegistryApplicationName = "MilligramClientAuthorizeExample";
+	public const string RegistrySettingsKey = $@"SOFTWARE\{RegistryApplicationName}";
+}
+
+namespace MilligramClient.Common;
+
+public class ExecutionTracker
+{
+    private readonly Action? _onSuspend;
+    private readonly Action? _onResume;
+    private readonly CancellationTokenSource _cancellationSource;
+
+    private long _nestingLevel;
+
+    public bool IsExecuted => Interlocked.Read(ref _nestingLevel) != 0;
+
+    public ExecutionTracker()
+        : this(null, null)
+    {
+    }
+
+    public ExecutionTracker(Action? onSuspend, Action? onResume)
+    {
+        _onSuspend = onSuspend;
+        _onResume = onResume;
+
+        _cancellationSource = new CancellationTokenSource();
+    }
+
+    public ExecutionSuspenderContext TrackExecution()
+    {
+        return new ExecutionSuspenderContext(this, _cancellationSource.Token);
+    }
+
+    public class ExecutionSuspenderContext : IDisposable
+    {
+        private readonly ExecutionTracker _executionTracker;
+        private readonly CancellationToken _cancellationToken;
+
+        public ExecutionSuspenderContext(ExecutionTracker executionTracker, CancellationToken cancellationToken)
+        {
+            _executionTracker = executionTracker;
+            _cancellationToken = cancellationToken;
+
+            if (_cancellationToken.IsCancellationRequested)
+                return;
+
+            if (Interlocked.Increment(ref _executionTracker._nestingLevel) == 1)
+                _executionTracker._onSuspend?.Invoke();
+        }
+
+        public void Dispose()
+        {
+            if (_cancellationToken.IsCancellationRequested)
+                return;
+
+            if (Interlocked.Decrement(ref _executionTracker._nestingLevel) == 0)
+                _executionTracker._onResume?.Invoke();
+        }
+    }
+}
+
+using System.Diagnostics.CodeAnalysis;
+
+namespace MilligramClient.Common.Extensions;
+
+public enum ThreadLoading
+{
+    VeryHigh = 2,
+    High = 4,
+    Medium = 8,
+    Low = 12,
+    VeryLow = 16
+}
+
+public static class EnumerableExtensions
+{
+    public static bool IsNullOrEmpty<TValue>([NotNullWhen(false)] this IEnumerable<TValue>? values)
+    {
+        return values == null || !values.Any();
+    }
+
+    public static bool IsSignificant<TValue>([NotNullWhen(true)] this IEnumerable<TValue>? values)
+    {
+        return values != null && values.Any();
+    }
+
+    public static void ForEach<TValue>(this IEnumerable<TValue> values, Action<TValue> action)
+    {
+        foreach (var value in values)
+            action(value);
+    }
+
+    public static IEnumerable<TValue> EmptyIfNull<TValue>(this IEnumerable<TValue>? values)
+    {
+        return values ?? [];
+    }
+
+    public static Task WaitAllByPartsAsync<TIn>(this IEnumerable<TIn> collection, Func<TIn, Task> doAsync, ThreadLoading threadLoading)
+    {
+        return collection.WaitAllByPartsAsync(value => doAsync(value).ContinueWith(_ => false), threadLoading);
+    }
+
+    public static Task<TOut[]> WaitAllByPartsAsync<TIn, TOut>(this IEnumerable<TIn> collection, Func<TIn, Task<TOut>> doAsync, ThreadLoading threadLoading)
+    {
+        var count = (int) threadLoading;
+        var semaphoreSlim = new SemaphoreSlim(count, count);
+        return Task.WhenAll(
+            collection.Select(
+                value => Task.Run(
+                    async () =>
+                    {
+                        await semaphoreSlim.WaitAsync();
+                        try
+                        {
+                            return await doAsync(value);
+                        }
+                        finally
+                        {
+                            semaphoreSlim.Release();
+                        }
+                    })));
+    }
+}
+
+using System.Diagnostics.CodeAnalysis;
+
+namespace MilligramClient.Common.Extensions;
+
+public static class StringExtensions
+{
+    public static bool IsNullOrWhiteSpace([NotNullWhen(false)] this string? str)
+    {
+        return string.IsNullOrWhiteSpace(str);
+    }
+
+    public static string? NullIfEmpty(this string str)
+    {
+        return string.IsNullOrEmpty(str) ? null : str;
+    }
+
+    public static string EmptyIfNull(this string? str)
+    {
+        return str ?? string.Empty;
+    }
+
+    public static bool IsEquals(this string? source, string? searchString)
+    {
+        return string.Equals(source, searchString, StringComparison.Ordinal);
+    }
+
+    public static bool IsEqualsIgnoreCase(this string? source, string? searchString)
+    {
+        return string.Equals(source, searchString, StringComparison.OrdinalIgnoreCase);
+    }
+
+    public static TResult[] SplitAndParse<TResult>(
+        this string value,
+        char separator,
+        TryParseHandler<TResult> tryParse)
+    {
+        return value.Split(separator).SafeParse(tryParse).ToArray();
+    }
+
+    public static TResult?[] SplitAndParseWithDefaults<TResult>(
+        this string value,
+        char separator,
+        TryParseHandler<TResult> tryParse)
+    {
+        return value.Split(separator).SafeParseWithDefaults(tryParse).ToArray();
+    }
+
+    public static IEnumerable<TResult> SafeParse<TResult>(
+        this IEnumerable<string> values,
+        TryParseHandler<TResult> tryParse)
+    {
+        foreach (var value in values)
+        {
+            if (tryParse(value, out var result))
+                yield return result;
+        }
+    }
+
+    public static IEnumerable<TResult?> SafeParseWithDefaults<TResult>(
+        this IEnumerable<string> values,
+        TryParseHandler<TResult> tryParse)
+    {
+        foreach (var value in values)
+        {
+            if (tryParse(value, out var result))
+                yield return result;
+            else
+                yield return default;
+        }
+    }
+
+    public delegate bool TryParseHandler<T>(string value, out T result);
+}
+
+namespace MilligramClient.Common.Extensions;
+
+public static class TaskExtensions
+{
+    public static async void FireAndForgetSafeAsync(this Task task)
+    {
+        try
+        {
+            await task;
+        }
+        catch
+        {
+            // ignored
+        }
+    }
+}
+
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace MilligramClient.Common;
+
+public class PropertyChangedBase : INotifyPropertyChanged
+{
+	public event PropertyChangedEventHandler? PropertyChanged;
+
+	protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+	{
+		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+	}
+
+	protected bool Set<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+	{
+		if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+		field = value;
+		OnPropertyChanged(propertyName);
+		return true;
+	}
+}
+
+#pragma warning disable CS8618
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+
+namespace MilligramClient.Domain.Dtos;
+
+public class ChangePasswordDto
+{
+    public string OldPassword { get; set; }
+    public string NewPassword { get; set; }
+}
+
+namespace MilligramClient.Domain.Dtos
+{
+    public class ChatDto
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public Guid OwnerUserId { get; set; }
+    }
+}
+
+namespace MilligramClient.Domain.Dtos;
+
+public class ContactDto
+{
+	public string Name { get; set; }
+	public string? AddedUserNickname { get; set; }
+	public Guid AddedUserId { get; set; }
+}
+
+namespace MilligramClient.Domain.Dtos;
+
+public class FileDto
+{
+	public Guid Id { get; set; }
+	public byte[] Content { get; set; }
+	public string Name { get; set; }
+	public string Extension { get; set; }
+	public bool IsImage { get; set; }
+	public long SizeBytes { get; set; }
+}
+
+namespace MilligramClient.Domain.Dtos;
+
+public class HistoryMessagesDto
+{
+	public List<MessageDto> HistoryMessages { get; }
+}
+
+#pragma warning disable CS8618
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+
+namespace MilligramClient.Domain.Dtos;
+
+public class LoginDto
+{
+    public string Login { get; set; }
+    public string Password { get; set; }
+}
+
+namespace MilligramClient.Domain.Dtos;
+
+public class MessageDto
+{
+	Guid? Id { get; set; }
+	public string? Text { get; set; }
+	FileDto? FileDto { get; set; }
+	public DateTime CreationTime { get; set; }
+	public DateTime LastChangeTime { get; set; }
+	public Guid UserId { get; set; }
+	public string? UserNickname { get; set; }
+	public bool IsDeleted { get; set; }
+}
+
+#pragma warning disable CS8618
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+
+namespace MilligramClient.Domain.Dtos;
+
+public class RegisterDto
+{
+    public string Login { get; set; }
+    public string Password { get; set; }
+}
+
+#pragma warning disable CS8618
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+
+namespace MilligramClient.Domain.Dtos;
+
+public class TokenDto
+{
+    public string Token { get; set; }
+}
+
+namespace MilligramClient.Domain.Dtos;
+
+public class UserDto
+{
+	public Guid Id { get; set; }
+	public string Nickname { get; set; }
+}
+
+using MilligramClient.Domain.Dtos;
+using MilligramClient.Domain.Model;
+
+namespace MilligramClient.Domain.Extensions;
+
+public static class ChatExtensions
+{
+    public static ChatDto ToDto (this ChatModel chat)
+    {
+        return new ChatDto
+        {
+            Name = chat.Name,
+        };
+    }
+}
+
+using MilligramClient.Domain.Dtos;
+using MilligramClient.Domain.Model;
+
+namespace MilligramClient.Domain.Extensions;
+
+public static class ContactExtensions
+{
+    public static ContactDto ToDto (this ContactModel contact)
+    {
+        return new ContactDto
+        {
+            Name = contact.Name,
+            
+        };
+    }
+}
+
+using MilligramClient.Domain.Dtos;
+using MilligramClient.Domain.Model;
+
+namespace MilligramClient.Domain.Extensions;
+
+public static class MessageExtensions
+{
+	public static MessageDto ToDto(this MessageModel message)
+	{
+		return new MessageDto
+		{
+			Text = message.Text,
+			UserNickname = message.Sender,
+			CreationTime = message.Timestamp,
+			LastChangeTime = message.Timestamp
+		};
+	}
+}
+
+namespace MilligramClient.Domain.Model;
+public class ChatModel
+{
+    public string Name { get; set; }
+}
+
+namespace MilligramClient.Domain.Model
+{
+    public class ContactModel
+    {
+        public string Name { get; set; }
+    }
+}
+
+namespace MilligramClient.Domain.Model;
+
+public class FileModel
+{
+	public string Name { get; set; }
+	public string Extension { get; set; }
+	public long Size { get; set; }
+}
+
+namespace MilligramClient.Domain.Model;
+
+public class MessageModel
+{
+	public string Sender { get; set; }
+	public string Text { get; set; }
+	public DateTime Timestamp { get; set; }
+}
+
+namespace MilligramClient.Services.Token;
+
+public interface ITokenStorage
+{
+	string? GetToken();
+	void SaveToken(string? token);
+}
+
+using Microsoft.Win32;
+using MilligramClient.Common;
+using MilligramClient.Common.Extensions;
+
+namespace MilligramClient.Services.Token;
+
+public class TokenStorage : ITokenStorage
+{
+	private const string RegistryTokenKey = "Token";
+
+	public string? GetToken()
+	{
+		try
+		{
+			using var key = Registry.CurrentUser.OpenSubKey(Constants.RegistrySettingsKey);
+			return key?.GetValue(RegistryTokenKey)?.ToString()?.NullIfEmpty();
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Ошибка чтения: {ex.Message}");
+			return null;
+		}
+	}
+
+	public void SaveToken(string? token)
+	{
+		try
+		{
+			using var key = Registry.CurrentUser.CreateSubKey(Constants.RegistrySettingsKey);
+
+			if (token.IsSignificant())
+				key.SetValue(RegistryTokenKey, token, RegistryValueKind.String);
+			else
+				key.DeleteValue(RegistryTokenKey, false);
+		}
+		catch
+		{
+			// ignore
+		}
+	}
+}
+
+<Application x:Class="MilligramClient.Wpf.App"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<Application.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="Themes/Styles.xaml" />
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</Application.Resources>
+</Application>
+
+using System.Windows;
+using MilligramClient.Api.Token;
+using MilligramClient.Common.Extensions;
+using MilligramClient.Services.Token;
+using MilligramClient.Wpf.Views.Login.Logic;
+using MilligramClient.Wpf.Views.Main.Logic;
+
+namespace MilligramClient.Wpf;
+
+public partial class App
+{
+	private readonly ITokenStorage _tokenStorage;
+	private readonly ITokenProvider _tokenProvider;
+	private readonly IMainWindowProvider _mainWindowProvider;
+	private readonly ILoginWindowProvider _loginWindowProvider;
+
+	public App(
+		ITokenStorage tokenStorage,
+		ITokenProvider tokenProvider,
+		IMainWindowProvider mainWindowProvider,
+		ILoginWindowProvider loginWindowProvider)
+	{
+		_tokenStorage = tokenStorage;
+		_tokenProvider = tokenProvider;
+		_mainWindowProvider = mainWindowProvider;
+		_loginWindowProvider = loginWindowProvider;
+
+		InitializeComponent();
+	}
+
+	protected override void OnStartup(StartupEventArgs e)
+	{
+		base.OnStartup(e);
+
+		ShowStartupWindow().FireAndForgetSafeAsync();
+	}
+
+	private async Task ShowStartupWindow()
+	{
+		if (await TryRestoreTokenAsync().ConfigureAwait(false))
+			_mainWindowProvider.Show();
+		else
+			_loginWindowProvider.Show();
+	}
+
+	private async Task<bool> TryRestoreTokenAsync()
+	{
+		var token = _tokenStorage.GetToken();
+		if (token.IsNullOrEmpty())
+			return false;
+
+		try
+		{
+			await _tokenProvider.LoginAsync(token).ConfigureAwait(false);
+		}
+		catch
+		{
+			return false;
+		}
+
+		return true;
+	}
+}
+
+using System.Windows;
+
+[assembly: ThemeInfo(
+    ResourceDictionaryLocation.None,            //where theme specific resource dictionaries are located
+                                                //(used if a resource is not found in the page,
+                                                // or application resource dictionaries)
+    ResourceDictionaryLocation.SourceAssembly   //where the generic resource dictionary is located
+                                                //(used if a resource is not found in the page,
+                                                // app, or any theme specific resource dictionaries)
+)]
+
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfUserModel>
+	<UserModel>
+		<Username />
+		<Password />
+		<IsRememberUser>false</IsRememberUser>
+	</UserModel>
+	<UserModel>
+		<Username>qwerty</Username>
+		<Password />
+		<IsRememberUser>false</IsRememberUser>
+	</UserModel>
+</ArrayOfUserModel>
+
+namespace MilligramClient.Wpf;
+
+public static class DemoLocator
+{
+	public static TService Locate<TService>() where TService : class
+	{
+		if (typeof(TService).Name == Locator.FactoryName)
+			return null;
+
+		return Locator.Current.Locate<TService>();
+	}
+}
+
+namespace MilligramClient.Wpf.Extensions;
+
+public static class EnumerableExtensions
+{
+	public static void ForEach<TValue>(this IEnumerable<TValue> values, Action<TValue> action)
+	{
+		foreach (var value in values)
+			action(value);
+	}
+}
+
+using MilligramClient.Common.Wpf.Base;
+using MilligramClient.Common.Wpf.Dispatcher;
+using MilligramClient.Common.Wpf.View;
+
+namespace MilligramClient.Wpf.Extensions;
+
+public static class ViewModelExtensions
+{
+	/// <summary>
+	///     Открытие диалога. Использовать только внутри IDispatcherHelper
+	/// </summary>
+	/// <param name="viewModel"></param>
+	/// <returns></returns>
+	public static bool? OpenDialog(this IViewModel viewModel)
+	{
+		var viewService = Locator.Current.Locate<IViewService>();
+#pragma warning disable CS0618
+		return viewService.OpenDialog(viewModel);
+#pragma warning restore CS0618
+	}
+
+	/// <summary>
+	///     Открытие диалога. Использовать при отсутствии необходимости результата
+	/// </summary>
+	/// <param name="viewModel"></param>
+	public static void OpenDialogInUi(this IViewModel viewModel)
+	{
+		var dispatcherHelper = Locator.Current.Locate<IDispatcherHelper>();
+		dispatcherHelper.CheckBeginInvokeOnUI(() => viewModel.OpenDialog());
+	}
+
+	/// <summary>
+	///     Открытие диалога. Использовать при необходимости результата
+	/// </summary>
+	/// <param name="viewModel"></param>
+	/// <returns></returns>
+	public static Task<bool?> OpenDialogInUiAsync(this IViewModel viewModel)
+	{
+		var dispatcherHelper = Locator.Current.Locate<IDispatcherHelper>();
+		var tcs = new TaskCompletionSource<bool?>();
+		dispatcherHelper.CheckBeginInvokeOnUI(
+			() =>
+			{
+				var res = viewModel.OpenDialog();
+				tcs.SetResult(res);
+			});
+
+		return tcs.Task;
+	}
+}
+
+using GalaSoft.MvvmLight.Messaging;
+using Grace.DependencyInjection;
+using Grace.Factory;
+using MilligramClient.Api.Clients.Account;
+using MilligramClient.Api.Clients.Chats;
+using MilligramClient.Api.Clients.Contacts;
+using MilligramClient.Api.Clients.SendMessage;
+using MilligramClient.Api.Token;
+using MilligramClient.Common;
+using MilligramClient.Common.Wpf.Dispatcher;
+using MilligramClient.Common.Wpf.MessageBox;
+using MilligramClient.Common.Wpf.View;
+using MilligramClient.Services.Token;
+using MilligramClient.Wpf.Views.Login.Logic;
+using MilligramClient.Wpf.Views.Main.Logic;
+
+namespace MilligramClient.Wpf;
+
+public class Locator : ILocatorService
+{
+    private readonly DependencyInjectionContainer _container;
+    private static readonly Lazy<Locator> Lazy = new(() => new Locator());
+
+    public static Locator Current => Lazy.Value;
+    public static string FactoryName => "IFactory";
+
+    private Locator()
+    {
+        _container = new DependencyInjectionContainer();
+        _container.Configure(RegisterDependencies);
+    }
+
+    private static void RegisterDependencies(IExportRegistrationBlock registration)
+    {
+        registration.ExportInterfaceFactories(type => type.Name == FactoryName);
+
+        RegisterApis(registration);
+        RegisterServices(registration);
+    }
+
+    private static void RegisterApis(IExportRegistrationBlock registration)
+    {
+        RegisterSingleton<ITokenProvider, SlidingTokenProvider>(registration,
+            scope => new SlidingTokenProvider(scope.Locate<IAccountClient>(), Constants.RefreshSlidingTokenBeforeExpirationInPercent));
+
+        RegisterSingleton<IAccountClient, AccountClient>(registration,
+            _ => new AccountClient(Constants.ServerAddress, Constants.RequestTimeout));
+
+        RegisterSingleton<IChatsClient, ChatsClient>(registration,
+            scope => new ChatsClient(scope.Locate<ITokenProvider>(), Constants.ServerAddress, Constants.RequestTimeout));
+
+        RegisterSingleton<IContactsClient, ContactsClient>(registration,
+            scope => new ContactsClient(scope.Locate<ITokenProvider>(), Constants.ServerAddress, Constants.RequestTimeout));
+
+        RegisterSingleton<ISendMessageClient, SendMessageClient>(registration,
+            scope => new SendMessageClient(scope.Locate<ITokenProvider>(), Constants.ServerAddress, Constants.RequestTimeout));
+    }
+
+    private static void RegisterServices(IExportRegistrationBlock registration)
+    {
+        RegisterSingleton<IMainWindowProvider, MainWindowProvider>(registration);
+        RegisterSingleton<ILoginWindowProvider, LoginWindowProvider>(registration);
+
+        RegisterSingleton<IViewService, ViewService>(registration);
+        RegisterSingleton<IDispatcherHelper, DispatcherHelperAdapter>(registration);
+        RegisterSingleton<IMessageBoxService, MessageBoxService>(registration);
+
+        RegisterSingleton<IMessenger, Messenger>(registration);
+
+		RegisterSingleton<ITokenStorage, TokenStorage>(registration);
+    }
+
+    private static void RegisterSingleton<TFrom, TTo>(IExportRegistrationBlock registrationBlock) where TTo : TFrom
+    {
+        registrationBlock.Export<TTo>().As<TFrom>().Lifestyle.Singleton();
+    }
+
+    private static void RegisterSingleton<TFrom, TTo>(IExportRegistrationBlock registrationBlock, Func<IExportLocatorScope, TTo> injectionFactory) where TTo : TFrom
+    {
+        registrationBlock.ExportFactory(injectionFactory).As<TFrom>().Lifestyle.Singleton();
+    }
+
+#pragma warning disable CS8625, CS8601
+    public object GetService(Type serviceType)
+    {
+        return _container.Locate(serviceType);
+    }
+    public bool CanLocate(Type type, ActivationStrategyFilter? consider = null, object? key = null)
+    {
+        return _container.CanLocate(type, consider, key);
+    }
+    public object Locate(Type type)
+    {
+        return _container.Locate(type);
+    }
+    public object LocateOrDefault(Type type, object defaultValue)
+    {
+        return _container.LocateOrDefault(type, defaultValue);
+    }
+    public T Locate<T>()
+    {
+        return _container.Locate<T>();
+    }
+    public T LocateOrDefault<T>(T defaultValue = default)
+    {
+        return _container.LocateOrDefault(defaultValue);
+    }
+    public List<object> LocateAll(Type type, object extraData = null, ActivationStrategyFilter consider = null, IComparer<object> comparer = null)
+    {
+        return _container.LocateAll(type, extraData, consider, comparer);
+    }
+    public List<T> LocateAll<T>(Type type = null, object extraData = null, ActivationStrategyFilter consider = null, IComparer<T> comparer = null)
+    {
+        return _container.LocateAll(type, extraData, consider, comparer);
+    }
+    public bool TryLocate<T>(out T value, object extraData = null, ActivationStrategyFilter consider = null, object withKey = null, bool isDynamic = false)
+    {
+        return _container.TryLocate(out value, extraData, consider, withKey, isDynamic);
+    }
+    public bool TryLocate(Type type, out object value, object extraData = null, ActivationStrategyFilter consider = null, object withKey = null, bool isDynamic = false)
+    {
+        return _container.TryLocate(type, out value, extraData, consider, withKey, isDynamic);
+    }
+    public object LocateByName(string name, object extraData = null, ActivationStrategyFilter consider = null)
+    {
+        return _container.LocateByName(name, extraData, consider);
+    }
+    public List<object> LocateAllByName(string name, object extraData = null, ActivationStrategyFilter consider = null)
+    {
+        return _container.LocateAllByName(name, extraData, consider);
+    }
+    public bool TryLocateByName(string name, out object value, object extraData = null, ActivationStrategyFilter consider = null)
+    {
+        return _container.TryLocateByName(name, out value, extraData, consider);
+    }
+    // ReSharper disable MethodOverloadWithOptionalParameter
+    public object Locate(Type type, object extraData = null, ActivationStrategyFilter consider = null, object withKey = null, bool isDynamic = false)
+    {
+        return _container.Locate(type, extraData, consider, withKey, isDynamic);
+    }
+    public T Locate<T>(object extraData = null, ActivationStrategyFilter consider = null, object withKey = null, bool isDynamic = false)
+    {
+        return _container.Locate<T>(extraData, consider, withKey, isDynamic);
+    }
+    // ReSharper restore MethodOverloadWithOptionalParameter
+#pragma warning restore CS8625, CS8601
+}
+
+using MilligramClient.Wpf.Views.Login;
+
+namespace MilligramClient.Wpf.Messages;
+
+public class ChangeLoginWindowMessage
+{
+    public LoginState LoginState { get; }
+
+    public ChangeLoginWindowMessage(LoginState loginState)
+    {
+        LoginState = loginState;
+    }
+}
+
+namespace MilligramClient.Wpf.Messages;
+
+public class CloseLoginWindowMessage
+{
+}
+
+--- Файл: D:\Учеба\Академия Топ\Repositories\MilligramClient\MilligramClient.Wpf\Messages\ExitLoginWindowMessage.cs ---
+
+namespace MilligramClient.Wpf.Messages;
+
+public class ExitLoginWindowMessage
+{
+}
+
+using GalaSoft.MvvmLight;
+using MilligramClient.Wpf.Enums;
+
+namespace MilligramClient.Wpf.Models;
+
+public class CellModel : ObservableObject, ICloneable
+{
+	public CellValues _value;
+
+	public CellValues Value
+	{
+		get => _value;
+		set => Set(ref _value, value);
+	}
+
+	public bool IsNone() => Value == CellValues.None;
+	public object Clone()
+	{
+		var clone = (CellModel) MemberwiseClone();
+		return clone;
+	}
+}
+
+using System.Collections.ObjectModel;
+using MilligramClient.Wpf.Enums;
+
+namespace MilligramClient.Wpf.Models;
+
+public class FieldModel
+{
+	public ObservableCollection<ObservableCollection<CellModel>> Field { get; set; }
+
+	public FieldModel()
+	{
+		Field = new ObservableCollection<ObservableCollection<CellModel>>();
+
+		for (var i = 0; i < Constants.FieldSize; i++)
+		{
+			var row = new ObservableCollection<CellModel>();
+
+			for (var j = 0; j < Constants.FieldSize; j++)
+				row.Add(new CellModel());
+
+			Field.Add(row);
+		}
+	}
+	public void Clear()
+	{
+		foreach (var cell in Field.SelectMany(row => row))
+			cell.Value = CellValues.None;
+	}
+}
+
+using GalaSoft.MvvmLight;
+
+namespace MilligramClient.Wpf.Models;
+
+public class UserModel : ViewModelBase, ICloneable
+{
+	private string _username;
+	private string _password;
+	private bool _isRememberUser;
+	public UserModel()
+	{
+		Username = string.Empty;
+		Password = string.Empty;
+		IsRememberUser = false;
+	}
+
+    public string Username
+	{
+		get => _username;
+		set => Set(ref _username, value);
+	}
+
+	public string Password
+	{
+		get => _password;
+		set => Set(ref _password, value);
+	}
+
+	public bool IsRememberUser
+	{
+		get => _isRememberUser;
+		set => Set(ref _isRememberUser, value);
+	}
+
+	public object Clone()
+	{
+		var clone = (UserModel) MemberwiseClone();
+		return clone;
+	}
+}
+
+namespace MilligramClient.Wpf {
+    
+    
+    /// <summary>
+    /// App
+    /// </summary>
+    public partial class App : System.Windows.Application, System.Windows.Markup.IComponentConnector {
+        
+        private bool _contentLoaded;
+        
+        /// <summary>
+        /// InitializeComponent
+        /// </summary>
+        [System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("PresentationBuildTasks", "9.0.6.0")]
+        public void InitializeComponent() {
+            if (_contentLoaded) {
+                return;
+            }
+            _contentLoaded = true;
+            System.Uri resourceLocater = new System.Uri("/MilligramClient.Wpf;component/app.xaml", System.UriKind.Relative);
+            
+            #line 1 "..\..\..\App.xaml"
+            System.Windows.Application.LoadComponent(this, resourceLocater);
+            
+            #line default
+            #line hidden
+        }
+        
+        [System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("PresentationBuildTasks", "9.0.6.0")]
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]
+        [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
+        void System.Windows.Markup.IComponentConnector.Connect(int connectionId, object target) {
+            this._contentLoaded = true;
+        }
+    }
+}
+
+
+
+namespace MilligramClient.Wpf {
+    
+    
+    /// <summary>
+    /// App
+    /// </summary>
+    public partial class App : System.Windows.Application, System.Windows.Markup.IComponentConnector {
+        
+        private bool _contentLoaded;
+        
+        /// <summary>
+        /// InitializeComponent
+        /// </summary>
+        [System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("PresentationBuildTasks", "9.0.6.0")]
+        public void InitializeComponent() {
+            if (_contentLoaded) {
+                return;
+            }
+            _contentLoaded = true;
+            System.Uri resourceLocater = new System.Uri("/MilligramClient.Wpf;component/app.xaml", System.UriKind.Relative);
+            
+            #line 1 "..\..\..\App.xaml"
+            System.Windows.Application.LoadComponent(this, resourceLocater);
+            
+            #line default
+            #line hidden
+        }
+        
+        [System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("PresentationBuildTasks", "9.0.6.0")]
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]
+        [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
+        void System.Windows.Markup.IComponentConnector.Connect(int connectionId, object target) {
+            this._contentLoaded = true;
+        }
+    }
+}
+
+namespace MilligramClient.Wpf;
+
+public static class Program
+{
+	[STAThread]
+	private static void Main(string[] args)
+	{
+		Locator.Current.Locate<App>().Run();
+	}
+}
+
+--- Файл: D:\Учеба\Академия Топ\Repositories\MilligramClient\MilligramClient.Wpf\Themes\Styles.xaml ---
+
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:system="clr-namespace:System;assembly=mscorlib"
+					xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro">
+	<ResourceDictionary.MergedDictionaries>
+		<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+		<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+		<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
+		<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.Buttons.xaml" />
+		<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.TextBox.xaml" />
+		<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.PasswordBox.xaml" />
+	</ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>
+
+
+using GalaSoft.MvvmLight.Messaging;
+using MilligramClient.Api.Token;
+using MilligramClient.Common.Wpf.MessageBox;
+using MilligramClient.Services.Token;
+
+namespace MilligramClient.Wpf.Views.Login.Controls.Login;
+
+public class DemoModel : LoginControlViewModel
+{
+    public DemoModel() : base(
+        DemoLocator.Locate<IMessenger>(),
+        DemoLocator.Locate<ITokenStorage>(),
+        DemoLocator.Locate<ITokenProvider>(),
+        DemoLocator.Locate<IMessageBoxService>())
+    {
+	}
+}
+
+<UserControl x:Class="MilligramClient.Wpf.Views.Login.Controls.Login.LoginControl"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:converters="clr-namespace:MilligramClient.Common.Wpf.Converters;assembly=MilligramClient.Common.Wpf"
+			 xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+			 xmlns:behaviors="clr-namespace:MilligramClient.Common.Wpf.Behaviors;assembly=MilligramClient.Common.Wpf"
+			 xmlns:login="clr-namespace:MilligramClient.Wpf.Views.Login.Controls.Login"
+			 xmlns:wpfControls="clr-namespace:MilligramClient.Common.Wpf.Controls;assembly=MilligramClient.Common.Wpf"
+			 xmlns:helpers="clr-namespace:MilligramClient.Common.Wpf.Helpers;assembly=MilligramClient.Common.Wpf"
+			 mc:Ignorable="d"
+             d:DesignHeight="500"
+             d:DesignWidth="450"
+			 d:DataContext="{DynamicResource DemoModel}">
+
+
+    <UserControl.Resources>
+        <login:DemoModel x:Key="DemoModel" />
+    </UserControl.Resources>
+
+    <UserControl.InputBindings>
+        <KeyBinding Command="{Binding LoginCommand, Mode=OneWay}" Key="Enter" />
+    </UserControl.InputBindings>
+
+    <Grid Background="{StaticResource MahApps.Brushes.Badged.Background}">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <TextBox x:Name="LoginTextBox"
+				 Grid.Row="0"
+				 Margin="3,3,3,3"
+				 BorderBrush="White"
+				 Background="GhostWhite"
+				 Text="{Binding Login, Mode=TwoWay, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}">
+            <i:Interaction.Behaviors>
+                <behaviors:HandleFrameworkElementMouseMoveBehavior />
+            </i:Interaction.Behaviors>
+            <TextBox.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="3" />
+                </Style>
+            </TextBox.Resources>
+        </TextBox>
+
+        <TextBlock Grid.Row="0"
+                   Margin="5,5,5,5"
+				   FontSize="16"
+				   IsHitTestVisible="False"
+				   Text="Login or Email"
+				   Foreground="DarkGray">
+            <TextBlock.Style>
+                <Style TargetType="{x:Type TextBlock}">
+                    <Setter Property="Visibility" Value="Hidden" />
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Login, Mode=OneWay}" Value="" />
+                                <Condition Binding="{Binding IsFocused, ElementName=LoginTextBox, Mode=OneWay}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Visibility" Value="Visible" />
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+
+        <Button
+				Focusable="False"
+				HorizontalAlignment="Left"
+				VerticalAlignment="Center"
+				Command="{Binding CleanLoginCommand}"
+				Visibility="{Binding Login, Converter={converters:StringEmptyToVisibilityConverter UseHidden=True}, Mode=OneWay}" Height="36" Margin="466,0,0,0" Width="34">
+            <iconPacks:PackIconMaterial Margin="3"
+										Kind="Close" />
+        </Button>
+
+        <PasswordBox x:Name="PasswordTextBox"
+					 Grid.Row="1"
+					 Margin="3,3,3,3"
+					 FontSize="16"
+					 helpers:PasswordHelper.Attach="True"
+					 helpers:PasswordHelper.Password="{Binding Password, Mode=TwoWay, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}">
+            <i:Interaction.Behaviors>
+                <behaviors:HandleFrameworkElementMouseMoveBehavior />
+            </i:Interaction.Behaviors>
+            <PasswordBox.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="3" />
+                </Style>
+            </PasswordBox.Resources>
+        </PasswordBox>
+
+        <TextBlock Grid.Row="1"
+                   Margin="5,5,5,5"
+				   FontSize="16"
+				   IsHitTestVisible="False"
+				   Text="Your password"
+				   Foreground="DarkGray">
+            <TextBlock.Style>
+                <Style TargetType="{x:Type TextBlock}">
+                    <Setter Property="Visibility" Value="Hidden" />
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Password, Mode=OneWay}" Value="" />
+                                <Condition Binding="{Binding IsFocused, ElementName=PasswordTextBox, Mode=OneWay}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Visibility" Value="Visible" />
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+
+        <Button Grid.Row="1"
+				Focusable="False"
+				HorizontalAlignment="Left"
+				VerticalAlignment="Center"
+				Command="{Binding CleanPasswordCommand}"
+				Visibility="{Binding Password, Converter={converters:StringEmptyToVisibilityConverter UseHidden=True}, Mode=OneWay}" Height="36" Margin="466,0,0,0" Width="34">
+            <iconPacks:PackIconMaterial Margin="3"
+										Kind="Close" />
+        </Button>
+
+
+        <StackPanel Grid.Row="2"
+					Orientation="Vertical" Grid.RowSpan="2">
+
+            <StackPanel Orientation="Horizontal"
+						HorizontalAlignment="Center">
+                <TextBlock FontSize="14"
+					   Foreground="Black"
+					   Text="Нет аккаунта?"/>
+                <TextBlock Margin="5,0,0,0">
+				<Hyperlink FontSize="14"
+						   TextDecorations="None"
+						   behaviors:HyperlinkBehavior.IsExternal="true"
+						   Command="{Binding RegisterCommand, Mode=OneWay}">
+					<i:Interaction.Behaviors>
+						<behaviors:HandleContentElementMouseMoveBehavior />
+					</i:Interaction.Behaviors>
+					<TextBlock Text="Регистрация" />
+				</Hyperlink>
+			</TextBlock>
+            </StackPanel>
+            <CheckBox Content="Remember me"
+					  FontSize="16"
+					  VerticalContentAlignment="Center"
+					  IsThreeState="False"
+					  IsChecked="{Binding IsRememberMe, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+					  Foreground="{DynamicResource MahApps.Brushes.IdealForeground}"
+					  Style="{StaticResource MahApps.Styles.CheckBox}">
+
+            </CheckBox>
+
+        </StackPanel>
+
+        <StackPanel Grid.Row="4"
+					Orientation="Horizontal"
+					HorizontalAlignment="Center"
+					Margin="0,3,0,3" Width="150">
+
+            <Button Margin="3"
+					Width="70"
+					Background="Green"
+					Foreground="White"
+					Content="Log in"
+					Command="{Binding LoginCommand, Mode=OneWay}">
+                <Button.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="10" />
+                    </Style>
+                </Button.Resources>
+            </Button>
+
+            <Button Margin="2"
+					Width="70"
+					Background="Red"
+					Foreground="White"
+					Content="Exit"
+					Command="{Binding OnExitCommand, Mode=OneWay}">
+                <Button.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="10" />
+                    </Style>
+                </Button.Resources>
+            </Button>
+        </StackPanel>
+
+        <Grid Grid.Row="0" Grid.RowSpan="5" Background="#C4000000"
+			  Visibility="{Binding IsBusy, Mode=OneWay, Converter={converters:BoolToVisibilityConverter}}">
+            <wpfControls:CircleSpinner HorizontalAlignment="Center"
+									   VerticalAlignment="Center" />
+        </Grid>
+    </Grid>
+
+</UserControl>
+	
+namespace MilligramClient.Wpf.Views.Login.Controls.Login;
+
+public partial class LoginControl
+{
+    public LoginControl()
+    {
+        InitializeComponent();
+    }
+}
+
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Net;
+using System.Windows.Input;
+using GalaSoft.MvvmLight.CommandWpf;
+using GalaSoft.MvvmLight.Messaging;
+using MilligramClient.Api.Exceptions;
+using MilligramClient.Api.Token;
+using MilligramClient.Common;
+using MilligramClient.Common.Extensions;
+using MilligramClient.Common.Wpf.Base;
+using MilligramClient.Common.Wpf.Commands;
+using MilligramClient.Common.Wpf.MessageBox;
+using MilligramClient.Domain.Dtos;
+using MilligramClient.Services.Token;
+using MilligramClient.Wpf.Messages;
+
+namespace MilligramClient.Wpf.Views.Login.Controls.Login;
+
+public class LoginControlViewModel : ViewModel<LoginControl>, IDataErrorInfo
+{
+    private readonly IMessenger _messenger;
+    private readonly ITokenProvider _tokenProvider;
+    private readonly IMessageBoxService _messageBoxService;
+
+    private readonly ExecutionTracker _executionTracker;
+
+    private bool _isBusy;
+    private string _login;
+    private string _password;
+	private bool _isRememberMe;
+
+    private ICommand _cleanLoginCommand;
+    private ICommand _cleanPasswordCommand;
+    private ICommand _loginCommand;
+    private ICommand _registerCommand;
+	private ICommand _onExitCommand;
+
+    public override object Header => string.Empty;
+
+    public bool IsBusy
+    {
+        get => _isBusy;
+        set => Set(ref _isBusy, value);
+    }
+
+    public string Login
+    {
+        get => _login;
+        set => Set(ref _login, value);
+    }
+
+    public string Password
+    {
+        get => _password;
+        set => Set(ref _password, value);
+    }
+
+	public bool IsRememberMe
+	{
+		get => _isRememberMe;
+		set => Set(ref _isRememberMe, value);
+	}
+
+    public ICommand CleanLoginCommand => _cleanLoginCommand ??= new RelayCommand(OnCleanLogin);
+    public ICommand CleanPasswordCommand => _cleanPasswordCommand ??= new RelayCommand(OnCleanPassword);
+    public ICommand LoginCommand => _loginCommand ??= new AsyncRelayCommand(OnLoginAsync, CanLogin);
+    public ICommand RegisterCommand => _registerCommand ??= new RelayCommand(OnRegister);
+	public ICommand OnExitCommand => _onExitCommand ??= new RelayCommand(OnExit);
+
+    public LoginControlViewModel(
+        IMessenger messenger,
+		ITokenStorage tokenStorage, 
+		ITokenProvider tokenProvider,
+        IMessageBoxService messageBoxService)
+    {
+        _messenger = messenger;
+        _tokenProvider = tokenProvider;
+        _messageBoxService = messageBoxService;
+
+        _executionTracker = new ExecutionTracker(() => IsBusy = true, () => IsBusy = false);
+
+        Refresh();
+    }
+
+    public void Refresh()
+    {
+        Login = string.Empty;
+        Password = string.Empty;
+    }
+
+    private void OnCleanLogin()
+    {
+        Login = string.Empty;
+    }
+    private void OnCleanPassword()
+    {
+        Password = string.Empty;
+    }
+
+    private async Task OnLoginAsync()
+    {
+        using (_executionTracker.TrackExecution())
+        {
+            await LoginAsync().ConfigureAwait(false);
+
+            _messenger.Send(new CloseLoginWindowMessage());
+        }
+    }
+
+    private async Task LoginAsync()
+    {
+        try
+        {
+            var loginDto = new LoginDto { Login = Login, Password = Password };
+            await _tokenProvider.LoginAsync(loginDto).ConfigureAwait(false);
+        }
+        catch (SendRequestException exception) when (exception.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            _messageBoxService.Show("Некорректные логин и(или) пароль", "Ошибка");
+        }
+    }
+
+    private bool CanLogin()
+    {
+        return Login.IsSignificant() && Password.IsSignificant() && !HasError;
+    }
+
+    private void OnRegister()
+    {
+        ChangeLoginWindow(LoginState.Register);
+    }
+
+	private void OnExit()
+	{
+		_messenger.Send(new ExitLoginWindowMessage());
+    }
+
+    private void ChangeLoginWindow(LoginState loginState)
+    {
+        _messenger.Send(new ChangeLoginWindowMessage(loginState));
+    }
+
+    public string Error => string.Empty;
+
+    private ObservableCollection<string> _errors;
+
+    public virtual ObservableCollection<string> Errors
+    {
+        get
+        {
+            _errors = new ObservableCollection<string>();
+            var error = this[nameof(Login)];
+            if (!string.IsNullOrEmpty(error))
+                _errors.Add(error);
+            error = this[nameof(Password)];
+            if (!string.IsNullOrEmpty(error))
+                _errors.Add(error);
+            return _errors;
+        }
+    }
+
+    public virtual bool HasError => Errors?.Count > 0;
+
+    public string this[string columnName]
+    {
+        get
+        {
+            var error = string.Empty;
+            switch (columnName)
+            {
+                case nameof(Login):
+                {
+                    if (string.IsNullOrEmpty(Login))
+                        break;
+
+                    break;
+                }
+
+                case nameof(Password):
+                {
+                    if (string.IsNullOrEmpty(Password))
+                        break;
+
+                    if (Password.Length < 5)
+                        error = "Пароль должен состоять минимум из 5 символов";
+
+                    break;
+                }
+            }
+
+            return error;
+        }
+    }
+}
+
+using GalaSoft.MvvmLight.Messaging;
+using MilligramClient.Api.Clients.Account;
+using MilligramClient.Api.Token;
+using MilligramClient.Common.Wpf.MessageBox;
+using MilligramClient.Services.Token;
+
+namespace MilligramClient.Wpf.Views.Login.Controls.Register;
+
+public class DemoModel : RegisterControlViewModel
+{
+    public DemoModel() : base(
+        DemoLocator.Locate<IMessenger>(),
+        DemoLocator.Locate<ITokenStorage>(),
+        DemoLocator.Locate<IAccountClient>(),
+        DemoLocator.Locate<ITokenProvider>(),
+        DemoLocator.Locate<IMessageBoxService>())
+    {
+    }
+}
+
+<UserControl x:Class="MilligramClient.Wpf.Views.Login.Controls.Register.RegisterControl"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:converters="clr-namespace:MilligramClient.Common.Wpf.Converters;assembly=MilligramClient.Common.Wpf"
+			 xmlns:behaviors="clr-namespace:MilligramClient.Common.Wpf.Behaviors;assembly=MilligramClient.Common.Wpf"
+			 xmlns:register="clr-namespace:MilligramClient.Wpf.Views.Login.Controls.Register"
+			 xmlns:wpfControls="clr-namespace:MilligramClient.Common.Wpf.Controls;assembly=MilligramClient.Common.Wpf"
+			 xmlns:helpers="clr-namespace:MilligramClient.Common.Wpf.Helpers;assembly=MilligramClient.Common.Wpf"
+			 mc:Ignorable="d"
+			 d:DesignHeight="660"
+			 d:DesignWidth="500"
+			 d:DataContext="{DynamicResource DemoModel}">
+
+	<UserControl.Resources>
+		<register:DemoModel x:Key="DemoModel" />
+	</UserControl.Resources>
+
+	<UserControl.InputBindings>
+		<KeyBinding Command="{Binding RegisterCommand, Mode=OneWay}" Key="Enter" />
+	</UserControl.InputBindings>
+
+	<Grid Background="{StaticResource MahApps.Brushes.Badged.Background}">
+		<Grid VerticalAlignment="Center">
+			<StackPanel Margin="50,20">
+				<TextBlock Margin="0,16,0,0"
+						   FontSize="32"
+						   Text="Регистрация" />
+				<Grid Margin="0,16,0,10">
+					<TextBox x:Name="LoginTextBox"
+							 Padding="10,10"
+							 FontSize="16"
+							 BorderBrush="Black"
+							 Text="{Binding Login, Mode=TwoWay, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}">
+						<i:Interaction.Behaviors>
+							<behaviors:HandleFrameworkElementMouseMoveBehavior />
+						</i:Interaction.Behaviors>
+					</TextBox>
+					<TextBlock Margin="12,0,0,0"
+							   FontSize="16"
+							   IsHitTestVisible="False"
+							   Foreground="DarkGray"
+							   VerticalAlignment="Center"
+							   Text="Логин">
+						<TextBlock.Style>
+							<Style TargetType="{x:Type TextBlock}">
+								<Setter Property="Visibility" Value="Hidden" />
+								<Style.Triggers>
+									<MultiDataTrigger>
+										<MultiDataTrigger.Conditions>
+											<Condition Binding="{Binding Login, Mode=OneWay}" Value="" />
+											<Condition Binding="{Binding IsFocused, ElementName=LoginTextBox, Mode=OneWay}" Value="False" />
+										</MultiDataTrigger.Conditions>
+										<Setter Property="Visibility" Value="Visible" />
+									</MultiDataTrigger>
+								</Style.Triggers>
+							</Style>
+						</TextBlock.Style>
+					</TextBlock>
+				</Grid>
+				<Grid Margin="0,16,0,10">
+					<PasswordBox x:Name="PasswordTextBox"
+								 Padding="10,10"
+								 FontSize="16"
+								 BorderBrush="Black"
+								 helpers:PasswordHelper.Attach="True"
+								 helpers:PasswordHelper.Password="{Binding Password, Mode=TwoWay, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}">
+						<i:Interaction.Behaviors>
+							<behaviors:HandleFrameworkElementMouseMoveBehavior />
+						</i:Interaction.Behaviors>
+					</PasswordBox>
+					<TextBlock Margin="12,0,0,0"
+							   FontSize="16"
+							   IsHitTestVisible="False"
+							   Foreground="DarkGray"
+							   VerticalAlignment="Center"
+							   Text="Пароль">
+						<TextBlock.Style>
+							<Style TargetType="TextBlock">
+								<Setter Property="Visibility" Value="Hidden" />
+								<Style.Triggers>
+									<MultiDataTrigger>
+										<MultiDataTrigger.Conditions>
+											<Condition Binding="{Binding Password, Mode=OneWay}" Value="" />
+											<Condition Binding="{Binding IsFocused, ElementName=PasswordTextBox, Mode=OneWay}" Value="False" />
+										</MultiDataTrigger.Conditions>
+										<Setter Property="Visibility" Value="Visible" />
+									</MultiDataTrigger>
+								</Style.Triggers>
+							</Style>
+						</TextBlock.Style>
+					</TextBlock>
+				</Grid>
+				<Grid Margin="0,16,0,10">
+					<PasswordBox x:Name="ConfirmPasswordTextBox"
+								 Padding="10,10"
+								 FontSize="16"
+								 BorderBrush="Black"
+								 helpers:PasswordHelper.Attach="True"
+								 helpers:PasswordHelper.Password="{Binding ConfirmPassword, Mode=TwoWay, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}">
+						<i:Interaction.Behaviors>
+							<behaviors:HandleFrameworkElementMouseMoveBehavior />
+						</i:Interaction.Behaviors>
+					</PasswordBox>
+					<TextBlock Margin="12,0,0,0"
+							   FontSize="16"
+							   IsHitTestVisible="False"
+							   Foreground="DarkGray"
+							   VerticalAlignment="Center"
+							   Text="Подтверждение пароля">
+						<TextBlock.Style>
+							<Style TargetType="{x:Type TextBlock}">
+								<Setter Property="Visibility" Value="Hidden" />
+								<Style.Triggers>
+									<MultiDataTrigger>
+										<MultiDataTrigger.Conditions>
+											<Condition Binding="{Binding ConfirmPassword, Mode=OneWay}" Value="" />
+											<Condition Binding="{Binding IsFocused, ElementName=ConfirmPasswordTextBox, Mode=OneWay}" Value="False" />
+										</MultiDataTrigger.Conditions>
+										<Setter Property="Visibility" Value="Visible" />
+									</MultiDataTrigger>
+								</Style.Triggers>
+							</Style>
+						</TextBlock.Style>
+					</TextBlock>
+				</Grid>
+
+				<Button FontSize="16"
+						Margin="0,16,0,0"
+						Padding="10"
+						Command="{Binding RegisterCommand, Mode=OneWay}"
+						Content="Регистрация" />
+
+				<StackPanel Margin="0,26,0,0"
+							Orientation="Horizontal"
+							HorizontalAlignment="Center">
+					<TextBlock FontSize="14"
+							   Foreground="Black"
+							   Text="Уже есть аккаунт?" />
+					<TextBlock Margin="5,0,0,0">
+						<Hyperlink FontSize="14"
+								   TextDecorations="None"
+								   behaviors:HyperlinkBehavior.IsExternal="true"
+								   Command="{Binding LoginCommand, Mode=OneWay}">
+							<i:Interaction.Behaviors>
+								<behaviors:HandleContentElementMouseMoveBehavior />
+							</i:Interaction.Behaviors>
+							<TextBlock Text="Вход" />
+						</Hyperlink>
+					</TextBlock>
+				</StackPanel>
+			</StackPanel>
+		</Grid>
+
+		<Grid Background="#C4000000"
+			  Visibility="{Binding IsBusy, Mode=OneWay, Converter={converters:BoolToVisibilityConverter}}">
+			<wpfControls:CircleSpinner HorizontalAlignment="Center"
+									   VerticalAlignment="Center" />
+		</Grid>
+	</Grid>
+</UserControl>
+
+namespace MilligramClient.Wpf.Views.Login.Controls.Register;
+
+public partial class RegisterControl
+{
+    public RegisterControl()
+    {
+        InitializeComponent();
+    }
+}
+
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows.Input;
+using GalaSoft.MvvmLight.CommandWpf;
+using GalaSoft.MvvmLight.Messaging;
+using MilligramClient.Api.Clients.Account;
+using MilligramClient.Api.Token;
+using MilligramClient.Common;
+using MilligramClient.Common.Extensions;
+using MilligramClient.Common.Wpf.Base;
+using MilligramClient.Common.Wpf.Commands;
+using MilligramClient.Common.Wpf.MessageBox;
+using MilligramClient.Domain.Dtos;
+using MilligramClient.Services.Token;
+using MilligramClient.Wpf.Messages;
+
+namespace MilligramClient.Wpf.Views.Login.Controls.Register;
+
+public class RegisterControlViewModel : ViewModel<RegisterControl>, IDataErrorInfo
+{
+    private readonly IMessenger _messenger;
+	private readonly ITokenStorage _tokenStorage;
+    private readonly IAccountClient _accountClient;
+    private readonly ITokenProvider _tokenProvider;
+	private readonly IMessageBoxService _messageBoxService;
+
+    private readonly ExecutionTracker _executionTracker;
+
+    private CancellationTokenSource _cancellationTokenSource;
+
+    private bool _isBusy;
+    private string _login;
+    private string _password;
+    private string _confirmPassword;
+
+    private ICommand _loginCommand;
+    private ICommand _registerCommand;
+
+    public override object Header => string.Empty;
+
+    public bool IsBusy
+    {
+        get => _isBusy;
+        set => Set(ref _isBusy, value);
+    }
+
+    public string Login
+    {
+        get => _login;
+        set => Set(ref _login, value.Trim());
+    }
+
+    public string Password
+    {
+        get => _password;
+        set => Set(ref _password, value);
+    }
+
+    public string ConfirmPassword
+    {
+        get => _confirmPassword;
+        set => Set(ref _confirmPassword, value);
+    }
+
+    public ICommand LoginCommand => _loginCommand ??= new RelayCommand(OnLogin);
+    public ICommand RegisterCommand => _registerCommand ??= new AsyncRelayCommand(OnRegisterAsync, CanRegister);
+
+    public RegisterControlViewModel(
+        IMessenger messenger,
+		ITokenStorage tokenStorage,
+		IAccountClient accountClient,
+        ITokenProvider tokenProvider,
+		IMessageBoxService messageBoxService)
+    {
+        _messenger = messenger;
+		_tokenStorage = tokenStorage;
+        _accountClient = accountClient;
+        _tokenProvider = tokenProvider;
+		_messageBoxService = messageBoxService;
+
+        _executionTracker = new ExecutionTracker(() => IsBusy = true, () => IsBusy = false);
+
+        Refresh();
+    }
+
+    public void Refresh()
+    {
+        Login = string.Empty;
+        Password = string.Empty;
+        ConfirmPassword = string.Empty;
+    }
+
+    private void OnLogin()
+    {
+        ChangeLoginWindow(LoginState.Login);
+    }
+
+    private void ChangeLoginWindow(LoginState loginState)
+    {
+        _messenger.Send(new ChangeLoginWindowMessage(loginState));
+    }
+
+    private async Task OnRegisterAsync()
+    {
+		using (_executionTracker.TrackExecution())
+		{
+			if (await TryRegisterAsync().ConfigureAwait(false))
+				_messenger.Send(new CloseLoginWindowMessage());
+		}
+    }
+
+	private async Task<bool> TryRegisterAsync()
+	{
+		try
+		{
+			var registerDto = new RegisterDto { Login = Login, Password = Password };
+			await _accountClient.RegisterAsync(registerDto).ConfigureAwait(false);
+
+			var loginDto = new LoginDto { Login = Login, Password = Password };
+			await _tokenProvider.LoginAsync(loginDto).ConfigureAwait(false);
+			_tokenStorage.SaveToken(_tokenProvider.GetToken());
+
+			return true;
+		}
+		catch
+		{
+			_messageBoxService.Show("Ошибка регистрации", "Ошибка");
+
+			return false;
+		}
+	}
+
+    private bool CanRegister()
+    {
+        return Login.IsSignificant() && Password.IsSignificant() && ConfirmPassword.IsSignificant() && !HasError;
+    }
+
+    public string Error => string.Empty;
+
+    private ObservableCollection<string> _errors;
+
+    public virtual ObservableCollection<string> Errors
+    {
+        get
+        {
+            _errors = new ObservableCollection<string>();
+            var error = this[nameof(Login)];
+            if (!string.IsNullOrEmpty(error))
+                _errors.Add(error);
+            error = this[nameof(Password)];
+            if (!string.IsNullOrEmpty(error))
+                _errors.Add(error);
+            error = this[nameof(ConfirmPassword)];
+            if (!string.IsNullOrEmpty(error))
+                _errors.Add(error);
+            return _errors;
+        }
+    }
+
+    public virtual bool HasError => Errors?.Count > 0;
+
+    public string this[string columnName]
+    {
+        get
+        {
+            var error = string.Empty;
+            switch (columnName)
+            {
+                case nameof(Login):
+                {
+                    if (string.IsNullOrWhiteSpace(Login))
+                        break;
+
+                    break;
+                }
+
+                case nameof(Password):
+                {
+                    if (string.IsNullOrEmpty(Password))
+                        break;
+
+                    if (Password.Length < 5)
+                        error = "Пароль должен состоять минимум из 5 символов";
+                    else
+                        RaisePropertyChanged(nameof(ConfirmPassword));
+
+                    break;
+                }
+
+                case nameof(ConfirmPassword):
+                {
+                    if (string.IsNullOrEmpty(ConfirmPassword))
+                        break;
+
+                    if (ConfirmPassword != Password)
+                        error = "Пароли не совпадают";
+
+                    break;
+                }
+            }
+
+            return error;
+        }
+    }
+}
+
+using GalaSoft.MvvmLight.Messaging;
+using MilligramClient.Wpf.Views.Login.Controls.Login;
+using MilligramClient.Wpf.Views.Login.Controls.Register;
+using MilligramClient.Wpf.Views.Main.Logic;
+
+namespace MilligramClient.Wpf.Views.Login;
+
+public class DemoModel : LoginViewModel
+{
+	public DemoModel() : base(
+		DemoLocator.Locate<IMessenger>(),
+		DemoLocator.Locate<IMainWindowProvider>(),
+		DemoLocator.Locate<LoginControlViewModel>(),
+		DemoLocator.Locate<RegisterControlViewModel>())
+	{
+		LoginState = LoginState.Login;
+
+	}
+}
+
+--- Файл: D:\Учеба\Академия Топ\Repositories\MilligramClient\MilligramClient.Wpf\Views\Login\Logic\ILoginWindowProvider.cs ---
+
+namespace MilligramClient.Wpf.Views.Login.Logic;
+
+public interface ILoginWindowProvider
+{
+	void Show();
+	void CloseIfCreated();
+}
+
+--- Файл: D:\Учеба\Академия Топ\Repositories\MilligramClient\MilligramClient.Wpf\Views\Login\Logic\LoginWindowProvider.cs ---
+
+using System.ComponentModel;
+using System.Windows;
+using MilligramClient.Common.Wpf.Dispatcher;
+using MilligramClient.Common.Wpf.View;
+
+namespace MilligramClient.Wpf.Views.Login.Logic;
+
+public class LoginWindowProvider : ILoginWindowProvider
+{
+	private readonly IViewService _viewService;
+	private readonly IDispatcherHelper _dispatcherHelper;
+
+
+	private Window _authWindow;
+
+	public LoginWindowProvider(IViewService viewService, IDispatcherHelper dispatcherHelper)
+	{
+		_viewService = viewService;
+		_dispatcherHelper = dispatcherHelper;
+	}
+
+	public void Show()
+	{
+		_dispatcherHelper.CheckBeginInvokeOnUI(() =>
+		{
+			_authWindow ??= CreateWindow();
+			Application.Current.MainWindow = _authWindow;
+			_authWindow.Show();
+		});
+	}
+
+	public void CloseIfCreated()
+	{
+		_dispatcherHelper.CheckBeginInvokeOnUI(() => _authWindow?.Close());
+	}
+
+	private Window CreateWindow()
+	{
+		var window = _viewService.CreateWindow<LoginViewModel>(WindowMode.Window);
+		window.Closing += OnWindowClosing;
+		return window;
+	}
+
+	private void OnWindowClosing(object sender, CancelEventArgs e)
+	{
+		_authWindow.Closing -= OnWindowClosing;
+		_authWindow = null;
+	}
+}
+
+namespace MilligramClient.Wpf.Views.Login;
+
+public enum LoginState
+{
+    Login,
+    Register
+}
+
+using System.Windows.Input;
+using GalaSoft.MvvmLight.CommandWpf;
+using GalaSoft.MvvmLight.Messaging;
+using MilligramClient.Common.Wpf.Base;
+using MilligramClient.Common.Wpf.Messages;
+using MilligramClient.Wpf.Messages;
+using MilligramClient.Wpf.Views.Login.Controls.Login;
+using MilligramClient.Wpf.Views.Login.Controls.Register;
+using MilligramClient.Wpf.Views.Main.Logic;
+
+namespace MilligramClient.Wpf.Views.Login;
+
+public class LoginViewModel : ViewModel<LoginWindow>
+{
+	public override object Header => "Log in";
+
+	private readonly IMessenger _messenger;
+	private readonly IMainWindowProvider _mainWindowProvider;
+
+    private LoginState _loginState;
+
+    private ICommand? _contentRenderedCommand;
+
+    public LoginState LoginState
+    {
+        get => _loginState;
+        set => Set(ref _loginState, value);
+    }
+
+    public LoginControlViewModel? LoginControlViewModel { get; private set; }
+    public RegisterControlViewModel? RegisterControlViewModel { get; private set; }
+
+    public ICommand ContentRenderedCommand => _contentRenderedCommand ??= new RelayCommand(OnContentRendered);
+
+    public LoginViewModel(
+        IMessenger messenger,
+        IMainWindowProvider mainWindowProvider,
+        LoginControlViewModel loginControlViewModel,
+        RegisterControlViewModel registerControlViewModel)
+    {
+        _messenger = messenger;
+        _mainWindowProvider = mainWindowProvider;
+        LoginControlViewModel = loginControlViewModel;
+        RegisterControlViewModel = registerControlViewModel;
+
+        _messenger.Register<CloseLoginWindowMessage>(this, OnCloseLoginWindow);
+        _messenger.Register<ChangeLoginWindowMessage>(this, OnChangeLoginWindow);
+        _messenger.Register<ExitLoginWindowMessage>(this, OnExitLoginWindow);
+
+        LoginState = LoginState.Login;
+    }
+
+    private void OnContentRendered()
+    {
+        _mainWindowProvider.CloseIfCreated();
+    }
+
+    private void OnCloseLoginWindow(CloseLoginWindowMessage message)
+    {
+        _mainWindowProvider.Show();
+    }
+
+    private void OnChangeLoginWindow(ChangeLoginWindowMessage message)
+    {
+        ChangeLoginWindow(message.LoginState);
+    }
+    private void OnExitLoginWindow(ExitLoginWindowMessage message)
+    {
+		_messenger.Send(new RequestCloseMessage(this, null));
+    }
+
+    private void ChangeLoginWindow(LoginState loginState)
+    {
+        switch (loginState)
+        {
+            case LoginState.Login:
+                LoginControlViewModel?.Refresh();
+                break;
+            case LoginState.Register:
+                RegisterControlViewModel?.Refresh();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        LoginState = loginState;
+    }
+
+    public override void Cleanup()
+    {
+        LoginControlViewModel?.Cleanup();
+        LoginControlViewModel = null;
+        RegisterControlViewModel?.Cleanup();
+        RegisterControlViewModel = null;
+        _messenger.Unregister(this);
+        base.Cleanup();
+    }
+
+    public interface IFactory
+	{
+		LoginViewModel Create();
+	}
+}
+
+<controls:MetroWindow x:Class="MilligramClient.Wpf.Views.Login.LoginWindow"
+					  xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+					  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+					  xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+					  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+					  xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+					  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+					  xmlns:command="http://www.galasoft.ch/mvvmlight"
+					  xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+					  xmlns:converters="clr-namespace:MilligramClient.Common.Wpf.Converters;assembly=MilligramClient.Common.Wpf"
+					  xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+					  xmlns:behaviors="clr-namespace:MilligramClient.Common.Wpf.Behaviors;assembly=MilligramClient.Common.Wpf"
+					  xmlns:login="clr-namespace:MilligramClient.Wpf.Views.Login"
+					  mc:Ignorable="d"
+					  Title="{Binding Header, Mode=OneWay}"
+					  WindowStartupLocation="CenterScreen"
+					  ResizeMode="NoResize"
+					  Width="350"
+					  SizeToContent="Height"
+					  Background="Black"
+					  Foreground="White"
+					  FontSize="15"
+					  d:DataContext="{DynamicResource DemoModel}">
+
+	<controls:MetroWindow.Resources>
+		<login:DemoModel x:Key="DemoModel" />
+	</controls:MetroWindow.Resources>
+
+	<i:Interaction.Behaviors>
+		<behaviors:DragMoveBehavior />
+	</i:Interaction.Behaviors>
+
+	<i:Interaction.Triggers>
+		<i:EventTrigger EventName="ContentRendered">
+			<i:InvokeCommandAction Command="{Binding ContentRenderedCommand, Mode=OneWay}" />
+		</i:EventTrigger>
+	</i:Interaction.Triggers>
+
+	<Grid>
+		<ContentPresenter Content="{Binding LoginControlViewModel.TypedView, Mode=OneWay}"
+						  Visibility="{Binding LoginState, Converter={converters:EnumToVisibilityConverter}, ConverterParameter={x:Static login:LoginState.Login}, Mode=OneWay}" />
+		<ContentPresenter Content="{Binding RegisterControlViewModel.TypedView, Mode=OneWay}"
+						  Visibility="{Binding LoginState, Converter={converters:EnumToVisibilityConverter}, ConverterParameter={x:Static login:LoginState.Register}, Mode=OneWay}" />
+	</Grid>
+</controls:MetroWindow>
+
+namespace MilligramClient.Wpf.Views.Login;
+
+public partial class LoginWindow
+{
+	public LoginWindow()
+	{
+		InitializeComponent();
+	}
+}
+
+using GalaSoft.MvvmLight.Messaging;
+using MilligramClient.Api.Clients.Chats;
+using MilligramClient.Api.Clients.Contacts;
+using MilligramClient.Api.Clients.SendMessage;
+using MilligramClient.Api.Token;
+using MilligramClient.Common.Wpf.Dispatcher;
+using MilligramClient.Common.Wpf.MessageBox;
+using MilligramClient.Services.Token;
+using MilligramClient.Wpf.Views.Login.Logic;
+
+namespace MilligramClient.Wpf.Views.Main;
+
+public class DemoModel : MainViewModel
+{
+	public DemoModel() : base(
+		DemoLocator.Locate<IMessenger>(),
+		DemoLocator.Locate<ITokenStorage>(),
+		DemoLocator.Locate<ITokenProvider>(),
+		DemoLocator.Locate<IMessageBoxService>(),
+		DemoLocator.Locate<ILoginWindowProvider>(),
+		DemoLocator.Locate<IChatsClient>(),
+		DemoLocator.Locate<IContactsClient>(),
+		DemoLocator.Locate<ISendMessageClient>(),
+		DemoLocator.Locate<IDispatcherHelper>())
+	{
+    }
+}
+
+using MahApps.Metro.Controls;
+using Microsoft.Xaml.Behaviors;
+
+namespace MilligramClient.Wpf.Views.Main;
+
+public class HamburgerMenuBehavior : Behavior<HamburgerMenu>
+{
+	protected override void OnAttached()
+	{
+		base.OnAttached();
+		AssociatedObject.ItemInvoked += HamburgerMenu_ItemInvoked;
+	}
+
+	protected override void OnDetaching()
+	{
+		AssociatedObject.ItemInvoked -= HamburgerMenu_ItemInvoked;
+		base.OnDetaching();
+	}
+
+	private void HamburgerMenu_ItemInvoked(object sender, HamburgerMenuItemInvokedEventArgs e)
+	{
+		var viewModel = AssociatedObject.DataContext as MainViewModel;
+		if (viewModel == null) return;
+
+		if (e.InvokedItem is HamburgerMenuItem item)
+		{
+			viewModel.OnMenuSelected(item.Tag.ToString());
+		}
+	}
+
+}
+
+using System.ComponentModel;
+using System.Windows;
+using MahApps.Metro.IconPacks;
+using MilligramClient.Common;
+
+namespace MilligramClient.Wpf.Views.Main;
+
+public class HamburgerMenuItem : PropertyChangedBase, INotifyPropertyChanged
+{
+	private string _label;
+	private object _tag;
+	private Visibility _isVisible;
+	private PackIconIoniconsKind _icon;
+
+	public string Label
+	{
+		get => _label;
+		set => Set(ref _label, value);
+	}
+
+	public object Tag
+	{
+		get => _tag;
+		set => Set(ref _tag, value);
+	}
+
+	public PackIconIoniconsKind Icon
+	{
+		get => _icon;
+		set => Set(ref _icon, value);
+	}
+
+	public Visibility IsVisible
+	{
+		get => _isVisible;
+		set => Set(ref _isVisible, value);
+	}
+}
+
+using System.Collections.ObjectModel;
+using System.Windows;
+using MahApps.Metro.IconPacks;
+
+namespace MilligramClient.Wpf.Views.Main;
+
+public class HamburgerMenuItems
+{
+	public ObservableCollection<HamburgerMenuItem> MenuItems { get; } = new()
+	{
+		new HamburgerMenuItem { Label = "Contacts", Icon = PackIconIoniconsKind.ContactsMD, Tag = "contacts", IsVisible = Visibility.Visible },
+		new HamburgerMenuItem { Label = "Chats", Icon = PackIconIoniconsKind.ChatboxesMD, Tag = "chats", IsVisible = Visibility.Visible },
+		new HamburgerMenuItem { Label = "Settings", Icon = PackIconIoniconsKind.SettingsMD, Tag = "settings", IsVisible = Visibility.Visible },
+		new HamburgerMenuItem { Label = "New contact", Icon = PackIconIoniconsKind.PersonAddMD, Tag = "newContact", IsVisible = Visibility.Collapsed },
+		new HamburgerMenuItem { Label = "Delete contact", Icon = PackIconIoniconsKind.TrashMD, Tag = "deleteContact", IsVisible = Visibility.Collapsed },
+		new HamburgerMenuItem { Label = "New chat", Icon = PackIconIoniconsKind.AddCircleMD, Tag = "newChat", IsVisible = Visibility.Collapsed },
+		new HamburgerMenuItem { Label = "New private chat", Icon = PackIconIoniconsKind.LockMD, Tag = "newPrivateChat", IsVisible = Visibility.Collapsed },
+		new HamburgerMenuItem { Label = "Delete chat", Icon = PackIconIoniconsKind.TrashMD, Tag = "deleteChat", IsVisible = Visibility.Collapsed },
+		new HamburgerMenuItem { Label = "Back", Icon = PackIconIoniconsKind.ArrowBackMD, Tag = "back", IsVisible = Visibility.Collapsed }
+    };
+
+	public ObservableCollection<HamburgerMenuItem> MenuOptionsItems { get; } = new()
+	{
+		new HamburgerMenuItem { Label = "Log out", Icon = PackIconIoniconsKind.LogOutMD, Tag = "logOut", IsVisible = Visibility.Visible }
+	};
+}
+
+namespace MilligramClient.Wpf.Views.Main.Logic;
+
+public interface IMainWindowProvider
+{
+	void Show();
+	void CloseIfCreated();
+}
+
+using System.ComponentModel;
+using System.Windows;
+using GalaSoft.MvvmLight;
+using MilligramClient.Common.Wpf.Dispatcher;
+using MilligramClient.Common.Wpf.View;
+
+namespace MilligramClient.Wpf.Views.Main.Logic;
+
+public class MainWindowProvider : IMainWindowProvider
+{
+	private readonly IViewService _viewService;
+	private readonly IDispatcherHelper _dispatcherHelper;
+
+	private Window? _mainWindow;
+
+	public MainWindowProvider(IViewService viewService, IDispatcherHelper dispatcherHelper)
+	{
+		_viewService = viewService;
+		_dispatcherHelper = dispatcherHelper;
+	}
+
+	public void Show()
+	{
+		_dispatcherHelper.CheckBeginInvokeOnUI(() =>
+		{
+			_mainWindow ??= CreateWindow();
+			Application.Current.MainWindow = _mainWindow;
+			_mainWindow.Show();
+		});
+	}
+
+	public void CloseIfCreated()
+	{
+		_dispatcherHelper.CheckBeginInvokeOnUI(() => _mainWindow?.Close());
+	}
+
+	private Window CreateWindow()
+	{
+		var window = _viewService.CreateWindow<MainViewModel>(WindowMode.Window);
+		window.Closing += OnWindowClosing;
+		return window;
+	}
+
+	private void OnWindowClosing(object? sender, CancelEventArgs e)
+	{
+		if (_mainWindow == null)
+			return;
+
+		_mainWindow.Closing -= OnWindowClosing;
+		(_mainWindow.DataContext as ICleanup)?.Cleanup();
+		_mainWindow = null;
+	}
+}
+
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows;
+using System.Windows.Input;
+using GalaSoft.MvvmLight.CommandWpf;
+using GalaSoft.MvvmLight.Messaging;
+using MilligramClient.Api.Clients.Chats;
+using MilligramClient.Api.Clients.Contacts;
+using MilligramClient.Api.Clients.SendMessage;
+using MilligramClient.Api.Token;
+using MilligramClient.Common.Wpf.Base;
+using MilligramClient.Common.Wpf.Dispatcher;
+using MilligramClient.Common.Wpf.MessageBox;
+using MilligramClient.Common.Wpf.Messages;
+using MilligramClient.Domain.Model;
+using MilligramClient.Domain.Dtos;
+using MilligramClient.Services.Token;
+using MilligramClient.Wpf.Views.Login.Logic;
+using MilligramClient.Domain.Extensions;
+using System.Threading.Tasks;
+
+namespace MilligramClient.Wpf.Views.Main;
+
+public class MainViewModel : ViewModel<MainWindow>, INotifyPropertyChanged
+{
+    private string _login;
+    private string _newMessageText;
+    private string _statusMessage;
+    private HamburgerMenuItem _selectedMenuItem;
+    private ChatDto _selectedChat;
+    private ContactDto _selectedContact;
+    private MainWindowState _mainWindowState = MainWindowState.Chats;
+
+
+    private ICommand _contentRenderedCommand;
+    private ICommand _logoutCommand;
+    private ICommand _exitCommand;
+    private ICommand _menuCommand;
+    private ICommand _sendMessageCommand;
+    private ICommand _attachFileCommand;
+    private ICommand _getContactsCommand;
+
+    public override object Header => "Milligram";
+
+    private readonly IMessenger _messenger;
+    private readonly ITokenStorage _tokenStorage;
+    private readonly ITokenProvider _tokenProvider;
+    private readonly IMessageBoxService _messageBoxService;
+    private readonly ILoginWindowProvider _loginWindowProvider;
+    private readonly IChatsClient _chatsClient;
+    private readonly IContactsClient _contactsClient;
+    private readonly ISendMessageClient _sendMessageClient;
+    private readonly IDispatcherHelper _dispatcherHelper;
+
+    public HamburgerMenuItems Menu { get; } = new HamburgerMenuItems();
+    public ObservableCollection<HamburgerMenuItem> OptionsItems { get; }
+    public ObservableCollection<MessageModel> Messages { get; set; } = new ObservableCollection<MessageModel>();
+    public ObservableCollection<ChatDto> Chats { get; set; } = new ObservableCollection<ChatDto>();
+    public ObservableCollection<ContactDto> Contacts { get; set; } = new ObservableCollection<ContactDto>();
+
+    public MainWindowState MainWindowState
+    {
+        get => _mainWindowState;
+        set => Set(ref _mainWindowState, value);
+    }
+
+    public string Login
+    {
+        get => _login;
+        set => Set(ref _login, value);
+    }
+
+    public string NewMessageText
+    {
+        get => _newMessageText;
+        set => Set(ref _newMessageText, value);
+    }
+
+    public string StatusMessage
+    {
+        get => _statusMessage;
+        set => Set(ref _statusMessage, value);
+    }
+
+    public HamburgerMenuItem SelectedMenuItem
+    {
+        get => _selectedMenuItem;
+        set
+        {
+            Set(ref _selectedMenuItem, value);
+            if (value != null)
+            {
+                OnMenuSelected(value.Tag.ToString());
+            }
+        }
+    }
+
+    public ChatDto SelectedChat
+    {
+        get => _selectedChat;
+        set
+        {
+            Set(ref _selectedChat, value);
+            OnChatSelected();
+        }
+    }
+
+    public ContactDto SelectedContact
+    {
+        get => _selectedContact;
+        set => Set(ref _selectedContact, value);
+    }
+
+    // Команды
+    //public ICommand GetContactsCommand => _getContactsCommand ??= new RelayCommand(GetContacts);
+    public ICommand SendMessageCommand => _sendMessageCommand ??= new RelayCommand(SendMessage);
+    public ICommand AttachFileCommand => _attachFileCommand ??= new RelayCommand(AttachFile);
+    public ICommand ContentRenderedCommand => _contentRenderedCommand ??= new RelayCommand(OnContentRendered);
+    public ICommand MenuCommand => _menuCommand ??= new RelayCommand<string>(OnMenuSelected);
+    public ICommand LogoutCommand => _logoutCommand ??= new RelayCommand(OnLogout);
+    public ICommand ExitCommand => _exitCommand ??= new RelayCommand(OnExit);
+    public ICommand SelectChatCommand => new RelayCommand(OnChatSelected);
+
+    public MainViewModel(
+        IMessenger messenger,
+        ITokenStorage tokenStorage,
+        ITokenProvider tokenProvider,
+        IMessageBoxService messageBoxService,
+        ILoginWindowProvider loginWindowProvider,
+        IChatsClient chatsClient,
+        IContactsClient contactsClient,
+        ISendMessageClient sendMessageClient,
+        IDispatcherHelper dispatcherHelper)
+    {
+        _messenger = messenger;
+        _tokenStorage = tokenStorage;
+        _tokenProvider = tokenProvider;
+        _messageBoxService = messageBoxService;
+        _loginWindowProvider = loginWindowProvider;
+        _chatsClient = chatsClient;
+        _contactsClient = contactsClient;
+        _sendMessageClient = sendMessageClient;
+        _dispatcherHelper = dispatcherHelper;
+
+        // Пример сообщений (в реальном приложении будет загрузка из сервера)
+        Messages.Add(new MessageModel
+        {
+            Sender = "Система",
+            Text = "Добро пожаловать в чат!",
+            Timestamp = DateTime.Now
+        });
+    }
+
+    public void OnMenuSelected(string tag)
+    {
+        foreach (var item in Menu.MenuItems)
+        {
+            item.IsVisible = Visibility.Collapsed;
+        }
+
+        switch (tag)
+        {
+            case "contacts":
+                Menu.MenuItems.FirstOrDefault(i => i.Tag.ToString() == "newContact").IsVisible = Visibility.Visible;
+                Menu.MenuItems.FirstOrDefault(i => i.Tag.ToString() == "deleteContact").IsVisible = Visibility.Visible;
+                Menu.MenuItems.FirstOrDefault(i => i.Tag.ToString() == "back").IsVisible = Visibility.Visible;
+
+                MainWindowState = MainWindowState.Contacts;
+                if (!Contacts.Any())
+                    GetAllContacts();
+
+                break;
+            case "chats":
+                Menu.MenuItems.FirstOrDefault(i => i.Tag.ToString() == "newChat").IsVisible = Visibility.Visible;
+                Menu.MenuItems.FirstOrDefault(i => i.Tag.ToString() == "newPrivateChat").IsVisible = Visibility.Visible;
+                Menu.MenuItems.FirstOrDefault(i => i.Tag.ToString() == "deleteChat").IsVisible = Visibility.Visible;
+                Menu.MenuItems.FirstOrDefault(i => i.Tag.ToString() == "back").IsVisible = Visibility.Visible;
+
+                MainWindowState = MainWindowState.Chats;
+                if (!Chats.Any())
+                    GetAllChats();
+
+                break;
+            case "settings":
+                Menu.MenuItems.FirstOrDefault(i => i.Tag.ToString() == "back").IsVisible = Visibility.Visible;
+                break;
+            case "logOut":
+                LogoutCommand.Execute(null);
+                break;
+            case "back":
+                Menu.MenuItems.FirstOrDefault(i => i.Tag.ToString() == "contacts").IsVisible = Visibility.Visible;
+                Menu.MenuItems.FirstOrDefault(i => i.Tag.ToString() == "chats").IsVisible = Visibility.Visible;
+                Menu.MenuItems.FirstOrDefault(i => i.Tag.ToString() == "settings").IsVisible = Visibility.Visible;
+                break;
+        }
+    }
+
+    private async Task GetAllChats()
+    {
+        try
+        {
+            Chats.Clear(); // Очищаем предыдущие чаты
+            Console.WriteLine("Запрос чатов...");
+            var chats = await _chatsClient.GetChatsAsync().ConfigureAwait(false);
+            Console.WriteLine($"Получено чатов: {chats?.Count() ?? 0}");
+            // Обновляем коллекцию в UI-потоке
+            _dispatcherHelper.CheckBeginInvokeOnUI(() =>
+            {
+                if (chats != null)
+                {
+                    foreach (var chat in chats)
+                    {
+                        Console.WriteLine($"Чат: {chat.Name}, Owner: {chat.OwnerUserId}");
+                        Chats.Add(chat);
+                    }
+
+                    if (Chats.Any())
+                    {
+                        SelectedChat = Chats.First();
+                        Console.WriteLine($"Выбран чат: {SelectedChat.Name}");
+                    }
+                    else
+                    {
+                        StatusMessage = "Чаты не найдены";
+                    }
+                }
+                else
+                {
+                    StatusMessage = "Сервер вернул пустой список чатов";
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Ошибка: {ex.Message}";
+            Console.WriteLine($"Ошибка при получении чатов: {ex}");
+        }
+    }
+
+    private async Task GetAllContacts()
+    {
+        try
+        {
+            Contacts.Clear();
+            Console.WriteLine("Запрос контактов...");
+            var contacts = await _contactsClient.GetContactsAsync().ConfigureAwait(false);
+            Console.WriteLine($"Получено контактов: {contacts?.Count() ?? 0}");
+
+            _dispatcherHelper.CheckBeginInvokeOnUI(() =>
+            {
+                if (contacts != null)
+                {
+                    foreach (var contact in contacts)
+                    {
+                        Console.WriteLine($"Контакт: {contact.Name}");
+                        Contacts.Add(contact);
+                    }
+
+                    if (Contacts.Any())
+                    {
+                        SelectedContact = Contacts.First();
+                        Console.WriteLine($"Выбран контакт: {SelectedContact.Name}");
+                    }
+                    else
+                    {
+                        StatusMessage = "Контакты не найдены";
+                    }
+                }
+                else
+                {
+                    StatusMessage = "Сервер вернул пустой список контактов";
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Ошибка: {ex.Message}";
+            StatusMessage = $"Ошибка загрузки контактов: {ex.Message}";
+        }
+    }
+
+    private void OnChatSelected()
+    {
+        Messages.Clear();
+        GetNewMessages();
+    }
+
+
+    private void SendMessage()
+    {
+        SendMessages();
+    }
+
+    private async Task SendMessages()
+    {
+        if (string.IsNullOrWhiteSpace(NewMessageText)) return;
+
+        var newMessage = new MessageModel
+        {
+            Sender = Login,
+            Text = NewMessageText,
+            Timestamp = DateTime.Now
+        };
+
+        _dispatcherHelper.CheckBeginInvokeOnUI(() => { Messages.Add(newMessage); });
+
+
+        var sendMessage = await _chatsClient.AddMessageAsync(SelectedChat.Id, newMessage.ToDto()).ConfigureAwait(false);
+
+        NewMessageText = string.Empty;
+        StatusMessage = "Сообщение отправлено";
+    }
+
+    private void AttachFile()
+    {
+        var openFileDialog = new Microsoft.Win32.OpenFileDialog();
+        if (openFileDialog.ShowDialog() == true)
+        {
+            StatusMessage = $"Прикреплен файл: {openFileDialog.FileName}";
+            // Здесь можно добавить логику обработки файла
+        }
+    }
+
+    private async Task GetNewMessages()
+    {
+        //Загружаем сообщения для выбранного чата
+        var messages = await _chatsClient.GetMessagesAsync(SelectedChat.Id).ConfigureAwait(false);
+        _dispatcherHelper.CheckBeginInvokeOnUI(() =>
+        {
+            foreach (var message in messages)
+            {
+                Messages.Add(new MessageModel
+                {
+                    Sender = message.UserNickname,
+                    Text = message.Text,
+                    Timestamp = message.CreationTime
+                });
+            }
+        });
+    }
+    private void OnExit()
+    {
+        _messenger.Send(new RequestCloseMessage(this, null));
+    }
+
+    private void OnContentRendered()
+    {
+        _loginWindowProvider.CloseIfCreated();
+
+        Login = _tokenProvider.GetLoginFromToken();
+    }
+
+    private void OnLogout()
+    {
+        _tokenProvider.Logout();
+        _tokenStorage.SaveToken(null);
+        _loginWindowProvider.Show();
+    }
+
+    public override void Cleanup()
+    {
+        base.Cleanup();
+    }
+}
+
+<mah:MetroWindow x:Class="MilligramClient.Wpf.Views.Main.MainWindow"
+				 xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+				 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+				 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+				 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+				 xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+				 xmlns:hm="http://schemas.microsoft.com/xaml/behaviors"
+				 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+				 xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+				 xmlns:converters="clr-namespace:MilligramClient.Common.Wpf.Converters;assembly=MilligramClient.Common.Wpf"
+				 xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+				 xmlns:behaviors="clr-namespace:MilligramClient.Common.Wpf.Behaviors;assembly=MilligramClient.Common.Wpf"
+				 xmlns:main="clr-namespace:MilligramClient.Wpf.Views.Main"
+				 xmlns:converter="clr-namespace:MahApps.Metro.IconPacks.Converter;assembly=MahApps.Metro.IconPacks.Core"
+				 xmlns:сontrols="http://metro.mahapps.com/winfx/xaml/controls"
+				 xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+				 mc:Ignorable="d"
+				 ResizeMode="CanMinimize"
+				 ShowMaxRestoreButton="False"
+				 WindowStartupLocation="CenterScreen"
+				 Width="700"
+				 Height="650"
+				 Title="{Binding Header}"
+				 d:DataContext="{DynamicResource DemoModel}">
+
+	<controls:MetroWindow.Resources>
+		<main:DemoModel x:Key="DemoModel" />
+
+		<Style x:Key="ChatButtonStyle" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
+			<Setter Property="Margin" Value="5" />
+			<Setter Property="Padding" Value="10,5" />
+			<Setter Property="FontSize" Value="14" />
+		</Style>
+
+		<CollectionViewSource x:Key="MessagesViewSource" Source="{Binding Messages}">
+			<CollectionViewSource.SortDescriptions>
+				<componentModel:SortDescription PropertyName="Timestamp" Direction="Ascending" />
+			</CollectionViewSource.SortDescriptions>
+		</CollectionViewSource>
+
+	</controls:MetroWindow.Resources>
+
+	<i:Interaction.Behaviors>
+		<behaviors:DragMoveBehavior />
+	</i:Interaction.Behaviors>
+
+	<i:Interaction.Triggers>
+		<i:EventTrigger EventName="ContentRendered">
+			<i:InvokeCommandAction Command="{Binding ContentRenderedCommand, Mode=OneWay}" />
+		</i:EventTrigger>
+	</i:Interaction.Triggers>
+
+	<Grid>
+		<!-- Основное содержимое -->
+		<Grid>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="50" />
+				<ColumnDefinition Width="200" />
+				<ColumnDefinition Width="Auto" />
+			</Grid.ColumnDefinitions>
+
+			<Grid Grid.Column="1">
+				<!-- Список чатов -->
+				<ListView x:Name="ChatsList"
+						  ItemsSource="{Binding Chats}"
+						  SelectedItem="{Binding SelectedChat}"
+						  Visibility="{Binding MainWindowState, Converter={converters:EnumToVisibilityConverter}, ConverterParameter={x:Static main:MainWindowState.Chats}, Mode=OneWay}">
+					<!-- Шаблон элемента чата -->
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="5">
+                                <!-- Аватар -->
+                                <!--
+								<Image Source="{Binding AvatarUrl}"
+									   Width="40"
+									   Height="40"
+									   Margin="0,0,10,0" />-->
+
+                                <!-- Информация о контакте -->
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Name}"
+											   FontWeight="Bold" />
+                                    <!--<TextBlock Text="{Binding Status}"
+											   Foreground="Gray"
+											   FontSize="12" />-->
+                                </StackPanel>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+				<!-- Список контактов -->
+				<ListView x:Name="ContactsList"
+						  ItemsSource="{Binding Contacts}"
+						  SelectedItem="{Binding SelectedContact}"
+						  Visibility="{Binding MainWindowState, Converter={converters:EnumToVisibilityConverter}, ConverterParameter={x:Static main:MainWindowState.Contacts}, Mode=OneWay}">
+					<!-- Шаблон элемента контакта -->
+					<ListView.ItemTemplate>
+						<DataTemplate>
+							<StackPanel Orientation="Horizontal" Margin="5">
+								<!-- Аватар --><!--
+								<Image Source="{Binding AvatarUrl}"
+									   Width="40"
+									   Height="40"
+									   Margin="0,0,10,0" />-->
+
+								<!-- Информация о контакте -->
+								<StackPanel>
+									<TextBlock Text="{Binding Name}"
+											   FontWeight="Bold" />
+									<!--<TextBlock Text="{Binding Status}"
+											   Foreground="Gray"
+											   FontSize="12" />-->
+								</StackPanel>
+							</StackPanel>
+						</DataTemplate>
+					</ListView.ItemTemplate>
+				</ListView>
+
+				<i:Interaction.Behaviors>
+					<behaviors:HandleFrameworkElementMouseMoveBehavior />
+				</i:Interaction.Behaviors>
+
+			</Grid>
+
+			<!-- Поле сообщений -->
+			<StackPanel Grid.Column="2" Orientation="Vertical">
+
+				<Border Background="#FF4081" Height="40">
+					<TextBlock Text="{Binding SelectedChat.Name}"
+							   Foreground="White"
+							   FontSize="16"
+							   FontWeight="Bold"
+							   VerticalAlignment="Center"
+							   Margin="10,0"
+							   TextTrimming="CharacterEllipsis" />
+				</Border>
+
+				<ScrollViewer VerticalScrollBarVisibility="Auto"
+							  Height="430"
+							  Width="450"
+							  Background="CornflowerBlue">
+					<ItemsControl ItemsSource="{Binding Source={StaticResource MessagesViewSource}}">
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<Border Margin="5" Padding="10" BorderBrush="Black" BorderThickness="1" CornerRadius="5">
+									<StackPanel>
+										<TextBlock Text="{Binding Sender}" FontSize="14" FontWeight="Bold" Foreground="Black" />
+										<TextBlock Text="{Binding Text}" FontSize="14" Foreground="Black" TextWrapping="Wrap" Margin="0,5,0,0" />
+										<TextBlock Text="{Binding Timestamp}" FontSize="10" Foreground="Brown" HorizontalAlignment="Right" />
+									</StackPanel>
+								</Border>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+					<i:Interaction.Behaviors>
+						<behaviors:HandleFrameworkElementMouseMoveBehavior />
+					</i:Interaction.Behaviors>
+				</ScrollViewer>
+
+				<!-- Поле ввода сообщения -->
+				<StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="330" />
+							<ColumnDefinition Width="50" />
+							<ColumnDefinition Width="70" />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition />
+							<RowDefinition />
+						</Grid.RowDefinitions>
+
+						<TextBox Grid.Column="0" Grid.Row="0" HorizontalContentAlignment="Stretch"
+								 Text="{Binding NewMessageText, UpdateSourceTrigger=PropertyChanged}"
+								 VerticalContentAlignment="Center"
+								 controls:TextBoxHelper.Watermark="Введите сообщение..."
+								 Margin="5,5,5,0">
+							<TextBox.InputBindings>
+								<KeyBinding Key="Enter" Command="{Binding SendMessageCommand}" />
+							</TextBox.InputBindings>
+							<i:Interaction.Behaviors>
+								<behaviors:HandleFrameworkElementMouseMoveBehavior />
+							</i:Interaction.Behaviors>
+						</TextBox>
+
+						<Button Grid.Column="1" Grid.Row="0"
+								Command="{Binding AttachFileCommand}"
+								Style="{StaticResource MahApps.Styles.Button.Circle}"
+								Width="40"
+								Height="40"
+								Margin="0,0,5,0"
+								ToolTip="Прикрепить файл">
+							<iconPacks:PackIconMaterial Kind="Paperclip" Width="24" Height="24" />
+						</Button>
+
+						<Button Grid.Column="2" Grid.Row="0"
+								Command="{Binding SendMessageCommand}"
+								Style="{StaticResource ChatButtonStyle}"
+								Content="SEND" />
+						<!-- Статусная строка -->
+						<StatusBar Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1"
+								   Background="Transparent">
+							<TextBlock Text="{Binding StatusMessage}" FontSize="12" Foreground="Black" />
+						</StatusBar>
+					</Grid>
+				</StackPanel>
+			</StackPanel>
+
+			<!--<StackPanel VerticalAlignment="Center"
+						HorizontalAlignment="Center">
+				<StackPanel Orientation="Horizontal">
+					<TextBlock FontSize="16"
+							   Padding="20,10"
+							   VerticalAlignment="Center"
+							   Text="{Binding Login, Mode=OneWay}" />
+
+					<Button Padding="20,10"
+							Command="{Binding LogoutCommand, Mode=OneWay}"
+							Content="Log out" />
+				</StackPanel>
+
+				<Button Margin="0,4,0,0"
+						Padding="20,10"
+						Command="{Binding ExitCommand, Mode=OneWay}"
+						Content="Exit" />
+			</StackPanel>-->
+
+		</Grid>
+
+		<!-- Меню -->
+		<mah:HamburgerMenu Grid.Column="0" x:Name="HamburgerMenuControl"
+						   ItemsSource="{Binding Menu.MenuItems}"
+						   SelectedItem="{Binding SelectedMenuItem, Mode=TwoWay}"
+						   SelectedOptionsItem="{Binding SelectedMenuItem, Mode=TwoWay}"
+						   OptionsItemsSource="{Binding Menu.MenuOptionsItems}">
+
+			<mah:HamburgerMenu.HamburgerMenuHeaderTemplate>
+				<DataTemplate>
+					<TextBlock HorizontalAlignment="Center"
+							   VerticalAlignment="Center"
+							   FontSize="16"
+							   Foreground="White"
+							   Text="{Binding }" />
+				</DataTemplate>
+			</mah:HamburgerMenu.HamburgerMenuHeaderTemplate>
+
+			<mah:HamburgerMenu.ItemTemplate>
+				<DataTemplate>
+					<StackPanel Orientation="Horizontal" Visibility="{Binding IsVisible}">
+						<iconPacks:PackIconIonicons Kind="{Binding Icon}" Padding="10" Width="50" Height="50" />
+						<TextBlock Text="{Binding Label}" VerticalAlignment="Center" FontSize="16" />
+					</StackPanel>
+				</DataTemplate>
+			</mah:HamburgerMenu.ItemTemplate>
+
+			<mah:HamburgerMenu.OptionsItemTemplate>
+				<DataTemplate>
+					<StackPanel Orientation="Horizontal" Visibility="{Binding IsVisible}">
+						<iconPacks:PackIconIonicons Kind="{Binding Icon}" Padding="10" Width="50" Height="50" />
+						<TextBlock Text="{Binding Label}" VerticalAlignment="Center" FontSize="16" />
+					</StackPanel>
+				</DataTemplate>
+			</mah:HamburgerMenu.OptionsItemTemplate>
+
+
+			<mah:HamburgerMenu.ContentTemplate>
+				<DataTemplate>
+					<TextBlock Text="{Binding Tag}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" />
+				</DataTemplate>
+			</mah:HamburgerMenu.ContentTemplate>
+
+			<i:Interaction.Behaviors>
+				<behaviors:HandleFrameworkElementMouseMoveBehavior />
+			</i:Interaction.Behaviors>
+
+		</mah:HamburgerMenu>
+
+	</Grid>
+</mah:MetroWindow>
+
+namespace MilligramClient.Wpf.Views.Main;
+
+public partial class MainWindow
+{
+	public MainWindow()
+	{
+		InitializeComponent();
+	}
+}
+
+namespace MilligramClient.Wpf.Views.Main;
+
+public enum MainWindowState { Chats, Contacts }

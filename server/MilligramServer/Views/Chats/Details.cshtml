@@ -1,0 +1,71 @@
+﻿@model ChatDetailsModel
+
+@{
+    ViewData["Title"] = $"Чат (Id = {Model.Chat.Id})";
+}
+
+<div class="mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>
+            Чат<br />
+            <small class="text-muted">Id = @Model.Chat.Id</small><br />
+            <small class="text-muted">Название = @Model.Chat.Name</small><br />
+            <small class="text-muted">
+                Тип =
+                @if (Model.Chat.OwnerUserId == null)
+                {
+                    <small> негрупповой</small>
+                }
+                else
+                {
+                    <small> групповой</small>
+                }
+            </small>
+            @if (Model.Chat.OwnerUserId != null)
+            {
+                <br />
+                <small class="text-muted">Id владельца = @Model.Chat.OwnerUserId</small>
+
+                <br />
+                <small class="text-muted">Логин владельца = @Model.Chat.OwnerUserName</small>
+            }
+            <br />
+            <small class="text-muted">
+                Статус =
+                @if (Model.Chat.IsDeleted == false)
+                {
+                    <small> активен</small>
+                }
+                else
+                {
+                    <small> удален</small>
+                }
+            </small>
+        </h2>
+    </div>
+</div>
+
+<div class="table-container mt-3">
+    <h4 class="mb-3">Участники чата:</h4>
+    <table class="table table-dark table-hover align-middle">
+        <colgroup>
+            <col style="width: 35%">
+            <col style="width: 65%">
+        </colgroup>
+        <thead>
+            <tr>
+                <th>@Html.DisplaySortColumnTitle(Model.SortBy, nameof(ChatModel.Id), model => model.Users.First().Id, true)</th>
+                <th>@Html.DisplaySortColumnTitle(Model.SortBy, nameof(ChatModel.Name), model => model.Users.First().Name)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model.Users.EmptyIfNull())
+            {
+                <tr>
+                    <td>@user.Id</td>
+                    <td>@user.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

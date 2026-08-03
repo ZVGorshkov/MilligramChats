@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MilligramClient.Api\MilligramClient.Api.csproj" />
+    <ProjectReference Include="..\MilligramClient.Common\MilligramClient.Common.csproj" />
+    <ProjectReference Include="..\MilligramClient.Domain\MilligramClient.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

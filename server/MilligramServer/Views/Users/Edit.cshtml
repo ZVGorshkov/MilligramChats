@@ -1,0 +1,87 @@
+﻿@model UserModel
+
+@{
+    ViewData["Title"] = $"Редактирование пользователя (Id = {Model.Id}, Login = {Model.Name})";
+}
+
+<div class="mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>
+            Редактирование пользователя<br />
+            <small class="text-muted">Id = @Model.Id</small><br />
+            <small class="text-muted">Логин = @Model.Name</small>
+        </h2>
+    </div>
+</div>
+
+@using (Html.BeginForm("Edit", "Users", FormMethod.Post))
+{
+    <div>
+        <div style="margin-top: 20px;">
+            <label asp-for="Name">@Html.DisplayNameFor(model => model.Name):</label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <label asp-for="Nickname">@Html.DisplayNameFor(model => model.Nickname):</label>
+            <input asp-for="Nickname" class="form-control" />
+            <span asp-validation-for="Nickname" class="text-danger"></span>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <label asp-for="NewPassword">@Html.DisplayNameFor(model => model.NewPassword):</label>
+            <input asp-for="NewPassword" class="form-control" />
+            <span asp-validation-for="NewPassword" class="text-danger"></span>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <label class="form-check-label">
+                <input class="form-check-input" asp-for="HasAdminRole" />
+                <span></span>
+                @Html.DisplayNameFor(model => model.HasAdminRole)
+            </label>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <label class="form-check-label">
+                <input class="form-check-input" asp-for="HasSwaggerRole" />
+                <span></span>
+                @Html.DisplayNameFor(model => model.HasSwaggerRole)
+            </label>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <button type="submit" class="btn btn-sm btn-primary" style="width: 200px;"><i class="fa fa-floppy-o"></i> 
+                Сохранить
+            </button>
+        </div>
+    </div>
+}
+
+@if (!Model.IsDeleted)
+{
+    @using (Html.BeginForm("Delete", "Users", new { Model.Id }, FormMethod.Post))
+    {
+        <button 
+            type="submit" 
+            class="btn btn-sm btn-danger" 
+            style="margin-top: 5px; width: 200px;" 
+            onclick="return deleteConfirm('пользователя @Model.Name?', '@Model.Id');"><i class="fa fa-trash"></i> 
+            Удалить
+        </button>
+    }
+}
+else
+{
+    @using (Html.BeginForm("Restore", "Users", new { Model.Id }, FormMethod.Post))
+    {
+        <button 
+            type="submit" 
+            class="btn btn-sm btn-success" 
+            style="margin-top: 5px; width: 200px;" 
+            onclick="return restoreConfirm('пользователя @Model.Name?', '@Model.Id');"><i class="fa fa-undo"></i> 
+            Восстановить
+        </button>
+    }
+}

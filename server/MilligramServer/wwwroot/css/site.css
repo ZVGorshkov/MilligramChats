@@ -1,0 +1,191 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+.main-content {
+    min-height: calc(100vh - 150px); /* Высота минус header/footer */
+    display: flex;
+    flex-direction: column;
+}
+
+.table-container {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.footer-content {
+    margin-top: auto;
+    padding: 1rem 0;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+/* Основные стили для тёмной темы */
+body {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+/* Навигационная панель */
+.navbar {
+    background-color: #1a1a1a !important;
+    border-bottom: 1px solid #333;
+}
+
+.nav-link {
+    color: #e0e0e0 !important;
+}
+
+    .nav-link:hover {
+        color: #ffffff !important;
+    }
+
+/* Таблицы */
+.table {
+    color: #ffffff;
+}
+
+.table-dark th a {
+    color: white !important;
+}
+
+    .table-dark th a:hover {
+        color: #e0e0e0 !important;
+        text-decoration: none;
+    }
+
+.table-hover tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+/* Формы */
+.form-control {
+    background-color: #333;
+    color: #ffffff;
+    border-color: #444;
+}
+
+    .form-control:focus {
+        background-color: #444;
+        color: #ffffff;
+        border-color: #555;
+    }
+
+/* Кнопки */
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-outline-primary {
+    color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+    .btn-outline-primary:hover {
+        background-color: #0d6efd;
+        color: #fff;
+    }
+
+/* Выпадающие меню */
+.dropdown-menu {
+    background-color: #333;
+    border-color: #444;
+}
+
+.dropdown-item {
+    color: #ffffff;
+}
+
+    .dropdown-item:hover {
+        background-color: #444;
+        color: #ffffff;
+    }
+
+/* Футер */
+.footer {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+    border-top: 1px solid #333;
+}
+
+/* Кастомные компоненты */
+.card {
+    background-color: #1e1e1e;
+    border-color: #333;
+}
+
+.modal-content {
+    background-color: #1e1e1e;
+    color: #ffffff;
+}
+
+.list-group-item {
+    background-color: #1e1e1e;
+    color: #ffffff;
+    border-color: #333;
+}
+
+/* Специфичные стили для вашего приложения */
+.props-table {
+    font-size: 1.4rem;
+}
+
+    .props-table td {
+        padding-left: 20px;
+    }
+
+.props-margin-top {
+    margin-top: 60px;
+}
+
+/* Кастомные стили для страницы пользователей */
+.user-actions-dropdown .dropdown-menu {
+    min-width: 12rem;
+}
+
+.user-actions-dropdown .dropdown-item {
+    padding: 0.5rem 1.5rem;
+}
+
+    .user-actions-dropdown .dropdown-item i {
+        width: 1.5em;
+        text-align: center;
+        margin-right: 0.5rem;
+    }
+
+.form-control::placeholder {
+    color: #adb5bd !important;
+    opacity: 1 !important;
+}
+
+.file-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.img-thumbnail {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #444;
+    border-radius: 4px;
+}

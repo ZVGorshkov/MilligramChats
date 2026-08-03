@@ -1,0 +1,66 @@
+﻿@model ContactModel
+
+@{
+    ViewData["Title"] = $"Редактирование контакта (Id = {Model.Id})";
+}
+
+<div class="mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>
+            Редактирование контакта<br />
+            <small class="text-muted">Id = @Model.Id</small>
+        </h2>
+    </div>
+</div>
+
+<form asp-action="Edit"
+      asp-route-userId="@Model.OwnerUserId"
+      asp-route-messageId="@Model.Id"
+      method="post">
+
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="AddedUserId" />
+    <input type="hidden" asp-for="AddedUserName" />
+    <input type="hidden" asp-for="OwnerUserId" />
+    <input type="hidden" asp-for="OwnerUserName" />
+    <input type="hidden" asp-for="IsDeleted" />
+
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mt-3">
+        <button type="submit" class="btn btn-primary">
+            <i class="fa fa-save"></i> Сохранить
+        </button>
+    </div>
+</form>
+
+@if (!Model.IsDeleted)
+{
+    <form asp-action="Delete"
+          asp-route-userId="@Model.OwnerUserId"
+          asp-route-contactId="@Model.Id"
+          method="post"
+          class="mt-2">
+        <button type="submit" class="btn btn-danger"
+                onclick="return confirm('Удалить контакт @Model.Id?')">
+            <i class="fa fa-trash"></i> Удалить
+        </button>
+    </form>
+}
+else
+{
+    <form asp-action="Restore"
+          asp-route-userId="@Model.OwnerUserId"
+          asp-route-contactId="@Model.Id"
+          method="post"
+          class="mt-2">
+        <button type="submit" class="btn btn-success"
+                onclick="return confirm('Восстановить контакт @Model.Id?')">
+            <i class="fa fa-undo"></i> Восстановить
+        </button>
+    </form>
+}

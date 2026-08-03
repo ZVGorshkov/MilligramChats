@@ -1,0 +1,54 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Models\**" />
+    <EmbeddedResource Remove="Models\**" />
+    <None Remove="Models\**" />
+    <Page Remove="Models\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ApplicationDefinition Remove="App.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Utile.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Grace" Version="7.2.1" />
+    <PackageReference Include="Grace.Factory" Version="7.2.1" />
+    <PackageReference Include="MahApps.Metro" Version="2.4.10" />
+    <PackageReference Include="MahApps.Metro.IconPacks" Version="5.1.0" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
+    <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
+    <PackageReference Include="WpfAnimatedGif" Version="2.0.2" />
+  </ItemGroup>
+	
+    <ItemGroup>
+		<Content Include="Resources\Emoji\**\*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+  <ItemGroup>
+    <Page Include="App.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MilligramClient.Api\MilligramClient.Api.csproj" />
+    <ProjectReference Include="..\MilligramClient.Common.Wpf\MilligramClient.Common.Wpf.csproj" />
+    <ProjectReference Include="..\MilligramClient.Common\MilligramClient.Common.csproj" />
+    <ProjectReference Include="..\MilligramClient.Domain\MilligramClient.Domain.csproj" />
+    <ProjectReference Include="..\MilligramClient.Services\MilligramClient.Services.csproj" />
+  </ItemGroup>
+
+</Project>

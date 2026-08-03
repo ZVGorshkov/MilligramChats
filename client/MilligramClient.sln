@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MilligramClient.Wpf", "MilligramClient.Wpf\MilligramClient.Wpf.csproj", "{2788CDA0-E48B-44AD-84A5-3D84C7E484BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MilligramClient.Domain", "MilligramClient.Domain\MilligramClient.Domain.csproj", "{3B21FC18-3C6E-4A67-A6D7-EC1596DD77F8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MilligramClient.Api", "MilligramClient.Api\MilligramClient.Api.csproj", "{E1590597-0D23-44E5-9A90-5792C64C0A2D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MilligramClient.Common", "MilligramClient.Common\MilligramClient.Common.csproj", "{0833242C-CF5C-4387-A986-BB568D8BF1FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MilligramClient.Common.Wpf", "MilligramClient.Common.Wpf\MilligramClient.Common.Wpf.csproj", "{09901D7C-5FB7-47D9-8C2A-AEBFDE12629D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MilligramClient.Services", "MilligramClient.Services\MilligramClient.Services.csproj", "{9588FCE5-0DD5-4564-8B87-3BED03252577}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2788CDA0-E48B-44AD-84A5-3D84C7E484BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2788CDA0-E48B-44AD-84A5-3D84C7E484BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2788CDA0-E48B-44AD-84A5-3D84C7E484BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2788CDA0-E48B-44AD-84A5-3D84C7E484BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B21FC18-3C6E-4A67-A6D7-EC1596DD77F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B21FC18-3C6E-4A67-A6D7-EC1596DD77F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B21FC18-3C6E-4A67-A6D7-EC1596DD77F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B21FC18-3C6E-4A67-A6D7-EC1596DD77F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1590597-0D23-44E5-9A90-5792C64C0A2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1590597-0D23-44E5-9A90-5792C64C0A2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1590597-0D23-44E5-9A90-5792C64C0A2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1590597-0D23-44E5-9A90-5792C64C0A2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0833242C-CF5C-4387-A986-BB568D8BF1FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0833242C-CF5C-4387-A986-BB568D8BF1FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0833242C-CF5C-4387-A986-BB568D8BF1FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0833242C-CF5C-4387-A986-BB568D8BF1FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09901D7C-5FB7-47D9-8C2A-AEBFDE12629D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09901D7C-5FB7-47D9-8C2A-AEBFDE12629D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09901D7C-5FB7-47D9-8C2A-AEBFDE12629D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09901D7C-5FB7-47D9-8C2A-AEBFDE12629D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9588FCE5-0DD5-4564-8B87-3BED03252577}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9588FCE5-0DD5-4564-8B87-3BED03252577}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9588FCE5-0DD5-4564-8B87-3BED03252577}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9588FCE5-0DD5-4564-8B87-3BED03252577}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2C7E39B7-0FCA-4F16-B916-350534672927}
+	EndGlobalSection
+EndGlobal

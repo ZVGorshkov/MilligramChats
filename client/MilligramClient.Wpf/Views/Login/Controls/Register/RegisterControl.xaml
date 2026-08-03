@@ -1,0 +1,163 @@
+﻿<UserControl x:Class="MilligramClient.Wpf.Views.Login.Controls.Register.RegisterControl"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:converters="clr-namespace:MilligramClient.Common.Wpf.Converters;assembly=MilligramClient.Common.Wpf"
+			 xmlns:behaviors="clr-namespace:MilligramClient.Common.Wpf.Behaviors;assembly=MilligramClient.Common.Wpf"
+			 xmlns:register="clr-namespace:MilligramClient.Wpf.Views.Login.Controls.Register"
+			 xmlns:wpfControls="clr-namespace:MilligramClient.Common.Wpf.Controls;assembly=MilligramClient.Common.Wpf"
+			 xmlns:helpers="clr-namespace:MilligramClient.Common.Wpf.Helpers;assembly=MilligramClient.Common.Wpf"
+			 mc:Ignorable="d"
+			 d:DesignHeight="660"
+			 d:DesignWidth="500"
+			 d:DataContext="{DynamicResource DemoModel}">
+
+	<UserControl.Resources>
+		<register:DemoModel x:Key="DemoModel" />
+	</UserControl.Resources>
+
+	<UserControl.InputBindings>
+		<KeyBinding Command="{Binding RegisterCommand, Mode=OneWay}" Key="Enter" />
+	</UserControl.InputBindings>
+
+	<Grid Background="{StaticResource MahApps.Brushes.Badged.Background}">
+		<Grid VerticalAlignment="Center">
+			<StackPanel Margin="50,20">
+				<TextBlock Margin="0,16,0,0"
+						   FontSize="32"
+						   Text="Регистрация" />
+				<Grid Margin="0,16,0,10">
+					<TextBox x:Name="LoginTextBox"
+							 Padding="10,10"
+							 FontSize="16"
+							 BorderBrush="Black"
+							 Text="{Binding Login, Mode=TwoWay, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}">
+						<i:Interaction.Behaviors>
+							<behaviors:HandleFrameworkElementMouseMoveBehavior />
+						</i:Interaction.Behaviors>
+					</TextBox>
+					<TextBlock Margin="12,0,0,0"
+							   FontSize="16"
+							   IsHitTestVisible="False"
+							   Foreground="DarkGray"
+							   VerticalAlignment="Center"
+							   Text="Логин">
+						<TextBlock.Style>
+							<Style TargetType="{x:Type TextBlock}">
+								<Setter Property="Visibility" Value="Hidden" />
+								<Style.Triggers>
+									<MultiDataTrigger>
+										<MultiDataTrigger.Conditions>
+											<Condition Binding="{Binding Login, Mode=OneWay}" Value="" />
+											<Condition Binding="{Binding IsFocused, ElementName=LoginTextBox, Mode=OneWay}" Value="False" />
+										</MultiDataTrigger.Conditions>
+										<Setter Property="Visibility" Value="Visible" />
+									</MultiDataTrigger>
+								</Style.Triggers>
+							</Style>
+						</TextBlock.Style>
+					</TextBlock>
+				</Grid>
+				<Grid Margin="0,16,0,10">
+					<PasswordBox x:Name="PasswordTextBox"
+								 Padding="10,10"
+								 FontSize="16"
+								 BorderBrush="Black"
+								 helpers:PasswordHelper.Attach="True"
+								 helpers:PasswordHelper.Password="{Binding Password, Mode=TwoWay, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}">
+						<i:Interaction.Behaviors>
+							<behaviors:HandleFrameworkElementMouseMoveBehavior />
+						</i:Interaction.Behaviors>
+					</PasswordBox>
+					<TextBlock Margin="12,0,0,0"
+							   FontSize="16"
+							   IsHitTestVisible="False"
+							   Foreground="DarkGray"
+							   VerticalAlignment="Center"
+							   Text="Пароль">
+						<TextBlock.Style>
+							<Style TargetType="TextBlock">
+								<Setter Property="Visibility" Value="Hidden" />
+								<Style.Triggers>
+									<MultiDataTrigger>
+										<MultiDataTrigger.Conditions>
+											<Condition Binding="{Binding Password, Mode=OneWay}" Value="" />
+											<Condition Binding="{Binding IsFocused, ElementName=PasswordTextBox, Mode=OneWay}" Value="False" />
+										</MultiDataTrigger.Conditions>
+										<Setter Property="Visibility" Value="Visible" />
+									</MultiDataTrigger>
+								</Style.Triggers>
+							</Style>
+						</TextBlock.Style>
+					</TextBlock>
+				</Grid>
+				<Grid Margin="0,16,0,10">
+					<PasswordBox x:Name="ConfirmPasswordTextBox"
+								 Padding="10,10"
+								 FontSize="16"
+								 BorderBrush="Black"
+								 helpers:PasswordHelper.Attach="True"
+								 helpers:PasswordHelper.Password="{Binding ConfirmPassword, Mode=TwoWay, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}">
+						<i:Interaction.Behaviors>
+							<behaviors:HandleFrameworkElementMouseMoveBehavior />
+						</i:Interaction.Behaviors>
+					</PasswordBox>
+					<TextBlock Margin="12,0,0,0"
+							   FontSize="16"
+							   IsHitTestVisible="False"
+							   Foreground="DarkGray"
+							   VerticalAlignment="Center"
+							   Text="Подтверждение пароля">
+						<TextBlock.Style>
+							<Style TargetType="{x:Type TextBlock}">
+								<Setter Property="Visibility" Value="Hidden" />
+								<Style.Triggers>
+									<MultiDataTrigger>
+										<MultiDataTrigger.Conditions>
+											<Condition Binding="{Binding ConfirmPassword, Mode=OneWay}" Value="" />
+											<Condition Binding="{Binding IsFocused, ElementName=ConfirmPasswordTextBox, Mode=OneWay}" Value="False" />
+										</MultiDataTrigger.Conditions>
+										<Setter Property="Visibility" Value="Visible" />
+									</MultiDataTrigger>
+								</Style.Triggers>
+							</Style>
+						</TextBlock.Style>
+					</TextBlock>
+				</Grid>
+
+				<Button FontSize="16"
+						Margin="0,16,0,0"
+						Padding="10"
+						Command="{Binding RegisterCommand, Mode=OneWay}"
+						Content="Регистрация" />
+
+				<StackPanel Margin="0,26,0,0"
+							Orientation="Horizontal"
+							HorizontalAlignment="Center">
+					<TextBlock FontSize="14"
+							   Foreground="Black"
+							   Text="Уже есть аккаунт?" />
+					<TextBlock Margin="5,0,0,0">
+						<Hyperlink FontSize="14"
+								   TextDecorations="None"
+								   behaviors:HyperlinkBehavior.IsExternal="true"
+								   Command="{Binding LoginCommand, Mode=OneWay}">
+							<i:Interaction.Behaviors>
+								<behaviors:HandleContentElementMouseMoveBehavior />
+							</i:Interaction.Behaviors>
+							<TextBlock Text="Вход" />
+						</Hyperlink>
+					</TextBlock>
+				</StackPanel>
+			</StackPanel>
+		</Grid>
+
+		<Grid Background="#C4000000"
+			  Visibility="{Binding IsBusy, Mode=OneWay, Converter={converters:BoolToVisibilityConverter}}">
+			<wpfControls:CircleSpinner HorizontalAlignment="Center"
+									   VerticalAlignment="Center" />
+		</Grid>
+	</Grid>
+</UserControl>
