@@ -518,11 +518,12 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBox Grid.Column="0" BorderBrush="Gray"
-				 HorizontalContentAlignment="Stretch"
-				 Text="{Binding NewMessageText, UpdateSourceTrigger=PropertyChanged}"
-				 VerticalContentAlignment="Center"
-				 controls:TextBoxHelper.Watermark="Введите сообщение...">
+                    <TextBox Grid.Column="0"
+                             BorderBrush="Gray"
+							 HorizontalContentAlignment="Stretch"
+							 Text="{Binding NewMessageText, UpdateSourceTrigger=PropertyChanged}"
+							 VerticalContentAlignment="Center"
+							 controls:TextBoxHelper.Watermark="Введите сообщение...">
                         <TextBox.InputBindings>
                             <KeyBinding Key="Enter" Command="{Binding SendMessageCommand}" />
                         </TextBox.InputBindings>
@@ -532,42 +533,42 @@
                     </TextBox>
 
 					<Button Grid.Column="1"
-				Command="{Binding AttachFileCommand}"
-				Style="{StaticResource MahApps.Styles.Button.Circle}"
-				Width="40"
-				Height="40"
-				Margin="5,0"
-				ToolTip="Прикрепить файл"
-				Background="{StaticResource TerminalBorderGray}"
-				Foreground="{StaticResource TerminalMenuButtonBrush}">
+							Command="{Binding AttachFileCommand}"
+							Style="{StaticResource MahApps.Styles.Button.Circle}"
+							Width="40"
+							Height="40"
+							Margin="5,0"
+							ToolTip="Прикрепить файл"
+							Background="{StaticResource TerminalBorderGray}"
+							Foreground="{StaticResource TerminalMenuButtonBrush}">
 						<iconPacks:PackIconMaterial Kind="Paperclip" Width="24" Height="24" />
 					</Button>
 
 					<Button x:Name="EmojiButton"
-		Grid.Column="2"
-		Command="{Binding ToggleEmojiPickerCommand}"
-		Style="{StaticResource MahApps.Styles.Button.Circle}"
-		Width="40"
-		Height="40"
-		Margin="0,0,5,0"
-		ToolTip="Смайлики"
-		Background="{StaticResource TerminalBorderGray}"
-		Foreground="{StaticResource TerminalMenuButtonBrush}">
+							Grid.Column="2"
+							Command="{Binding ToggleEmojiPickerCommand}"
+							Style="{StaticResource MahApps.Styles.Button.Circle}"
+							Width="40"
+							Height="40"
+							Margin="0,0,5,0"
+							ToolTip="Смайлики"
+							Background="{StaticResource TerminalBorderGray}"
+							Foreground="{StaticResource TerminalMenuButtonBrush}">
 						<iconPacks:PackIconMaterial Kind="EmoticonOutline" Width="24" Height="24" />
 					</Button>
 
                     <Popup PlacementTarget="{Binding ElementName=EmojiButton}"
-			   Placement="Top"
-			   HorizontalOffset="-160"
-			   StaysOpen="False"
-			   AllowsTransparency="True"
-			   PopupAnimation="Fade"
-			   IsOpen="{Binding IsEmojiPickerOpen, Mode=TwoWay}">
+						   Placement="Top"
+						   HorizontalOffset="-160"
+						   StaysOpen="False"
+						   AllowsTransparency="True"
+						   PopupAnimation="Fade"
+						   IsOpen="{Binding IsEmojiPickerOpen, Mode=TwoWay}">
                         <Border Background="{DynamicResource MahApps.Brushes.ThemeBackground}"
-					BorderBrush="{DynamicResource MahApps.Brushes.Gray7}"
-					BorderThickness="1"
-					CornerRadius="8"
-					Padding="5">
+								BorderBrush="{DynamicResource MahApps.Brushes.Gray7}"
+								BorderThickness="1"
+								CornerRadius="8"
+								Padding="5">
                             <ScrollViewer MaxHeight="260"
 							  VerticalScrollBarVisibility="Auto"
 							  HorizontalScrollBarVisibility="Disabled">

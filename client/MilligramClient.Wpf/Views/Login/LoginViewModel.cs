@@ -12,7 +12,7 @@ namespace MilligramClient.Wpf.Views.Login;
 
 public class LoginViewModel : ViewModel<LoginWindow>
 {
-	public override object Header => "Log in";
+	public override object Header => "Вход";
 
 	private readonly IMessenger _messenger;
 	private readonly IMainWindowProvider _mainWindowProvider;
