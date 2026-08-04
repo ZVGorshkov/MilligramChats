@@ -38,6 +38,8 @@
 				 Margin="3,3,3,3"
 				 BorderBrush="White"
 				 Background="GhostWhite"
+                 CaretBrush="Gray"
+                 Foreground="black"
 				 Text="{Binding Login, Mode=TwoWay, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}">
             <i:Interaction.Behaviors>
                 <behaviors:HandleFrameworkElementMouseMoveBehavior />
