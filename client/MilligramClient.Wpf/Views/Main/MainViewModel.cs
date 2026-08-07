@@ -444,6 +444,8 @@ public class MainViewModel : ViewModel<MainWindow>, INotifyPropertyChanged
 
                 MainWindowState = MainWindowState.Chats;
                 OpenChatSearch();
+
+                CreateChatAsync();
                 break;
 
             case "newPrivateChat":
